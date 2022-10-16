@@ -8,7 +8,7 @@ Perform differential privacy on subcluster data of graph.<br/>
 ## Visualization for Toy Example
 
 Please run `visualization.ipynb` on jupyter notebook, the code is only compatible for jupyter notebook. <br>
-This code will generate a interactive graph, with visible node attributes. <br>
+This code will generate an interactive graph, with visible node attributes. <br>
 Connected nodes means these two nodes are friend.
 
 - [x] Translation on Pokec Dataset
