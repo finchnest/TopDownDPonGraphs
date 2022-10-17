@@ -27,6 +27,9 @@ def main():
 
     # debug purposes (delete when no longer necessary)
     print(appArgs)
+    print(appArgs.top)
+    print(appArgs.med)
+    print(appArgs.bot)
 
 if __name__ == '__main__':
     main()

@@ -26,9 +26,9 @@ class AppArgs:
 
         # enforce top-down invariant
         if 'top' not in self._args:
-            raise Exception('No top-level contraint found. Use -t <top_constraint>')
+            raise Exception('No top-level contraint found. Use -t <top_constraint=value>')
         elif 'bot' in self._args and 'med' not in self._args:
-            raise Exception('No mid-level contraint found. Use -m <med_constraint>')
+            raise Exception('No mid-level contraint found. Use -m <med_constraint=value>')
 
     def _convertDictToHierarchy(self):
         self.top = self._convertDictToMemberVariable('top')
@@ -44,10 +44,20 @@ class AppArgs:
 
         # ex: convert ['k1=v1', 'k2=v2'] into [['k1', 'v1'], ['k2', 'v2']]
         equalArgs = [x.split('=') for x in splitArgs]
+        lengths = [len(x) for x in equalArgs]
+
+        # check if any inputs were not in name=value syntax
+        oddLengths = [x for x in lengths if x % 2]
+        if len(oddLengths) > 0:
+            raise Exception('Unexpected syntax. Use name=value')
+
+        # check for empty values, ex: "name=" (no value)
+        emptyValues = [x for x in equalArgs if len(x[1]) == 0]
+        if len(emptyValues) > 0:
+            raise Exception('Unexpected syntax. Use name=value where value is non-empty')
 
         # ex: convert [['k1', 'v1'], ['k2', 'v2']] into {'k1': 'v1', 'k2': 'v2'}
-        dictArgs = dict(equalArgs)
-        return dictArgs
+        return dict(equalArgs)
 
     def _checkValidKeys(self):
         self._checkValidKey(self.top, self.TOP_CONSTRAINTS)
@@ -61,4 +71,5 @@ class AppArgs:
 
         s = set(member.keys())
         if not s.union(permittedValues) == permittedValues:
-            raise Exception('Invalid keys found. Allowed keys are: ' + ' '.join(s))
+            sortedValues = sorted(list(permittedValues))
+            raise Exception('Invalid keys found. Allowed keys are: ' + ' '.join(sortedValues))

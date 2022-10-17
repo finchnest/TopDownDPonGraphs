@@ -21,9 +21,9 @@ class tAppArgs(unittest.TestCase):
                 'bot': 'bot1=3'}
         appArgs = AppArgs(args)
         appArgs.verify()
-        self.assertTrue(isinstance(appArgs.top, dict))
-        self.assertTrue(isinstance(appArgs.med, dict))
-        self.assertTrue(isinstance(appArgs.bot, dict))
+        self.assertIsInstance(appArgs.top, dict)
+        self.assertIsInstance(appArgs.med, dict)
+        self.assertIsInstance(appArgs.bot, dict)
 
     def testArgSplit(self):
         args = {'top': 'top1=abc,top2=25'}
@@ -45,7 +45,15 @@ class tAppArgs(unittest.TestCase):
     def testTopInvalidValue(self):
         args = {'top': 'fake=f'}
         appArgs = AppArgs(args)
-        self.assertRaises(Exception, lambda: appArgs.verify())
+
+        try:
+            appArgs.verify()
+        except Exception as ex:
+            self.assertNotIn('fake', ex.args[0])
+            self.assertIn('top1 top2', ex.args[0])
+            return
+
+        self.assertTrue(False, 'Test should throw exception')
 
     def testMedInvalidValue(self):
         args = {'top': 'top1=t', 'med': 'fake=f'}
@@ -54,6 +62,26 @@ class tAppArgs(unittest.TestCase):
 
     def testBotInvalidValue(self):
         args = {'top': 'top1=t', 'med': 'med1=1', 'bot': 'fake=f'}
+        appArgs = AppArgs(args)
+        self.assertRaises(Exception, lambda: appArgs.verify())
+
+    # CLI not in form of name=value
+    def testNoEqualSign(self):
+        args = {'top': 'top1'} # 'top1' instead of 'top1=value'
+        appArgs = AppArgs(args)
+
+        try:
+            appArgs.verify()
+        except Exception as ex:
+            self.assertNotIsInstance(ex, ValueError)
+            self.assertIsInstance(ex, Exception)
+            return
+
+        self.assertTrue(False, 'Test should throw exception')
+
+    # Form of "name=" with no value
+    def testEmptyValue(self):
+        args = {'top': 'top1='}
         appArgs = AppArgs(args)
         self.assertRaises(Exception, lambda: appArgs.verify())
 
