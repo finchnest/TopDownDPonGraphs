@@ -48,4 +48,18 @@ neighbor_info = get_neighbor_information() # this is a dict like {node_idx: [nei
 
 neighbors = neighbor_info[5]
 # this will return a list with all neighbor indices
-````
+```
+
+4. After Searching all the nodes that meets the requirement e.g. (matches some attribute like gender == 1)
+Then u will probabily get a list of node indices
+
+U can run the following code to obtain a new subgraph w.r.t. these nodes
+
+```python
+
+node_matches = some_search_function(graph)
+
+# node_matches = [1, 2, 4, 6]
+
+subgraph = graph.subgraph(node_matches)
+```
