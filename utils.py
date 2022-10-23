@@ -21,74 +21,77 @@ def parse_relation(relationships):
         res.append([line[0], line[1]])
     return res
 
-
-def get_graph_edge(relationships, max_node=20):
-    
-    pairs = parse_relation(relationships)
-
-    src, tgt = [], []
-    for p in pairs:
-        if int(p[0]) <= max_node and int(p[1]) <= max_node:
-            s, t = int(p[0]), int(p[1])
-            src.append(s)
-            tgt.append(t)
-    data = {'source':src, 'target': tgt}
-    edge_df = pd.DataFrame(data)
-    edge_df.to_csv('./toy_example_edge.csv', index=False)
-    G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
-    print('Edge Amount of this graph:', len(src))
-    return G
-
-def translate(text, to_language="en", text_language="sk"):
-
-    GOOGLE_TRANSLATE_URL = 'http://translate.google.sk/m?q=%s&tl=%s&sl=%s'
-
-    text = parse.quote(text)
-    url = GOOGLE_TRANSLATE_URL % (text,to_language,text_language)
-    response = requests.get(url)
-    data = response.text
-    expr = r'(?s)class="(?:t0|result-container)">(.*?)<'
-    result = re.findall(expr, data)
-    if (len(result) == 0):
-        return ""
-
-    return html.unescape(result[0])
-
 def parse_row(row):
     row = row.split('\t')
     row = row[:-1]
     return row
 
+def load_missing():
+    with open('./missing_users.txt') as f:
+        lines = f.readlines()
+    lst = [int(l.replace('\n', '')) for l in lines]
+    return lst
 
-def create_network(profiles, relationships, attr, max_node):
+def get_node_attribute(graph, node_index, attribute_key):
     
-    net = get_graph_edge(relationships, max_node)
-    # profiles = [parse_row(p) for p in profiles]
+    # graph: the networkx graph
+    # node_index: (int), the index for the node u want to get access to
+    # attribute_key: (str), the attribute you want to get access to e.g. 'gender', 'region'
+    
+    return graph.nodes[node_index][attribute_key]
 
+def get_neighbor_information(edge_path='./toy_example_edge_50.csv'):
+    
+    missing_user = load_missing()
+    edge_df = pd.read_csv(edge_path)
+    src = edge_df['source'].tolist()
+    tgt = edge_df['target'].tolist()
+    
+    neighbors = {}
+    for i in range(len(src)):
+        if src[i] not in missing_user and tgt[i] not in missing_user:
+            if src[i] in neighbors:
+                neighbors[src[i]].append(tgt[i])
+            else:
+                neighbors[src[i]] = [tgt[i]]
+            
+            if tgt[i] in neighbors:
+                neighbors[tgt[i]].append(src[i])
+            else:
+                neighbors[tgt[i]] = [src[i]]
+    
+    for k in neighbors.keys():
+        neighbors[k] = list(set(neighbors[k]))
+
+    return neighbors
+
+def create_network(profiles, attr, max_node, empty_user):
+    
+    net = get_graph_edge(max_node, empty_user)
     # profiles : dataframe
 
     all_attrs = {}
-    for idx, p in profiles:
-        node_attr = row_to_dict(p)
-        for i, v in enumerate(p):
-            # index, value
-            if v.isnumeric():
-                v = int(v)
-            if v != 'null':
-                node_attr[attr[i]] = v
-        node_id = int(p[0])
-        all_attrs[node_id] = node_attr
+    for idx, p in profiles.iterrows():
+        node_attr = row_to_dict(p, attr)
+        node_id = int(p['user_id'])
+        if node_id <= max_node:
+            all_attrs[node_id] = node_attr
     networkx.set_node_attributes(net, all_attrs)
     return net
 
-# def create_network(profiles, relationships, attr, max_node):
-    
-#     net = get_graph_edge(relationships, max_node)
-#     for i, a in enumerate(attr):
-#         if i != 0:     
-#             print(a)
-#             values = [p[i] for p in profiles]
-#             print(values)
-#             networkx.set_node_attributes(net, name=a, values=values)
+def load_from_csv(path):
+    df = pd.read_csv(path)
+    return df
 
-#     return net
+def row_to_dict(row, attr):
+    data = {}
+    for a in attr:
+        data[a] = row[a]
+    return data
+
+def get_graph_edge(max_node=20, empty_user=[]):
+    
+    edge_df = pd.read_csv('./toy_example_edge_50.csv')
+    G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
+    print('Edge Amount of this graph:', len(edge_df))
+    return G
