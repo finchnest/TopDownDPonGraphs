@@ -13,7 +13,6 @@ from bokeh.models import Range1d, Circle, ColumnDataSource, MultiLine
 from bokeh.plotting import figure
 from bokeh.plotting import from_networkx
 
-
 def parse_relation(relationships):
     res = []
     for line in relationships:
@@ -27,9 +26,9 @@ def parse_row(row):
     return row
 
 def load_missing():
-    with open('./missing_users.txt') as f:
+    with open('/Users/abeni/Projects/397-DP-Code/TopDownDPonGraphs/missing_users.txt', 'rb') as f:
         lines = f.readlines()
-    lst = [int(l.replace('\n', '')) for l in lines]
+    lst = [int(l.replace(b'\n', b'')) for l in lines]
     return lst
 
 def get_node_attribute(graph, node_index, attribute_key):
@@ -40,7 +39,7 @@ def get_node_attribute(graph, node_index, attribute_key):
     
     return graph.nodes[node_index][attribute_key]
 
-def get_neighbor_information(edge_path='./toy_example_edge_50.csv'):
+def get_neighbor_information(edge_path='/Users/abeni/Projects/397-DP-Code/TopDownDPonGraphs/toy_example_edge_50.csv'):
     
     missing_user = load_missing()
     edge_df = pd.read_csv(edge_path)
@@ -91,7 +90,9 @@ def row_to_dict(row, attr):
 
 def get_graph_edge(max_node=20, empty_user=[]):
     
-    edge_df = pd.read_csv('./toy_example_edge_50.csv')
+    edge_df = pd.read_csv('/Users/abeni/Projects/397-DP-Code/TopDownDPonGraphs/toy_example_edge_50.csv')
     G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
-    print('Edge Amount of this graph:', len(edge_df))
+    # print('Edge Amount of this graph:', len(edge_df))
     return G
+
+# load_missing()
