@@ -1,8 +1,3 @@
-# Note: to run all tests:
-# > python -m unittest
-
-# This syntax requires a folder to be called 'test' and test file names prefixed with 'test_'
-
 import sys
 import unittest
 
@@ -12,8 +7,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
 
 from AppArgs import AppArgs
+from Constraint import Constraint
+from RelationalOp import RelationalOp
 
-class tAppArgs(unittest.TestCase):
+class test_AppArgs(unittest.TestCase):
 
     def testBasic(self):
         args = {'top': 'top2=1',
@@ -21,16 +18,22 @@ class tAppArgs(unittest.TestCase):
                 'bot': 'bot1=3'}
         appArgs = AppArgs(args)
         appArgs.verify()
-        self.assertIsInstance(appArgs.top, dict)
-        self.assertIsInstance(appArgs.med, dict)
-        self.assertIsInstance(appArgs.bot, dict)
+        self.assertIsInstance(appArgs.top, list)
+        self.assertIsInstance(appArgs.top[0], Constraint)
+        self.assertIsInstance(appArgs.med, list)
+        self.assertIsInstance(appArgs.med[0], Constraint)
+        self.assertIsInstance(appArgs.bot, list)
+        self.assertIsInstance(appArgs.bot[0], Constraint)
 
     def testArgSplit(self):
         args = {'top': 'top1=abc,top2=25'}
         appArgs = AppArgs(args)
         appArgs.verify()
-        self.assertEqual(appArgs.top['top1'], 'abc')
-        self.assertEqual(appArgs.top['top2'], '25')
+        self.assertEqual(len(appArgs.top), 2)
+        self.assertEqual(appArgs.top[0].key, 'top1')
+        self.assertEqual(appArgs.top[0].value, 'abc')
+        self.assertEqual(appArgs.top[1].key, 'top2')
+        self.assertEqual(appArgs.top[1].value, '25')
 
     def testArgSplitHierarchy(self):
         args = {'top': 'top1=t1,top2=10',
@@ -38,9 +41,26 @@ class tAppArgs(unittest.TestCase):
                 'bot': 'bot1=b1,bot2=b2'}
         appArgs = AppArgs(args)
         appArgs.verify()
-        self.assertEqual(appArgs.top, {'top1': 't1', 'top2': '10'})
-        self.assertEqual(appArgs.med, {'med1': 'm1'})
-        self.assertEqual(appArgs.bot, {'bot1': 'b1', 'bot2': 'b2'})
+        self.assertEqual(len(appArgs.top), 2)
+        self.assertEqual(appArgs.top[0].key, 'top1')
+        self.assertEqual(appArgs.top[0].value, 't1')
+        self.assertEqual(appArgs.top[0].relationalOp, RelationalOp.EQUAL)
+        self.assertEqual(appArgs.top[1].key, 'top2')
+        self.assertEqual(appArgs.top[1].value, '10')
+        self.assertEqual(appArgs.top[1].relationalOp, RelationalOp.EQUAL)
+
+        self.assertEqual(len(appArgs.med), 1)
+        self.assertEqual(appArgs.med[0].key, 'med1')
+        self.assertEqual(appArgs.med[0].value, 'm1')
+        self.assertEqual(appArgs.med[0].relationalOp, RelationalOp.EQUAL)
+
+        self.assertEqual(len(appArgs.bot), 2)
+        self.assertEqual(appArgs.bot[0].key, 'bot1')
+        self.assertEqual(appArgs.bot[0].value, 'b1')
+        self.assertEqual(appArgs.bot[0].relationalOp, RelationalOp.EQUAL)
+        self.assertEqual(appArgs.bot[1].key, 'bot2')
+        self.assertEqual(appArgs.bot[1].value, 'b2')
+        self.assertEqual(appArgs.bot[1].relationalOp, RelationalOp.EQUAL)
 
     def testTopInvalidValue(self):
         args = {'top': 'fake=f'}

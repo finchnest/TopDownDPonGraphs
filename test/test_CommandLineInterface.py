@@ -1,8 +1,3 @@
-# Note: to run all tests:
-# > python -m unittest
-
-# This syntax requires a folder to be called 'test' and test file names prefixed with 'test_'
-
 import sys
 import unittest
 
@@ -12,27 +7,39 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
 import DP
 
-class tCommandLineInterface(unittest.TestCase):
+class test_CommandLineInterface(unittest.TestCase):
 
     # short form: -t, -m, -b
     def testShortForm(self):
         appArgs = DP.parseArgs(['-t', 'top1=constraint1', '-m', 'med2=constraint2', '-b', 'bot3=constraint3'])
-        self.assertEqual(appArgs.top, {'top1': 'constraint1'})
-        self.assertEqual(appArgs.med, {'med2': 'constraint2'})
-        self.assertEqual(appArgs.bot, {'bot3': 'constraint3'})
+        self.assertEqual(appArgs.top[0].key, 'top1')
+        self.assertEqual(appArgs.top[0].value, 'constraint1')
+        self.assertEqual(appArgs.med[0].key, 'med2')
+        self.assertEqual(appArgs.med[0].value, 'constraint2')
+        self.assertEqual(appArgs.bot[0].key, 'bot3')
+        self.assertEqual(appArgs.bot[0].value, 'constraint3')
 
     # long form: --top, --med, --bottom
     def testLongForm(self):
-        appArgs = DP.parseArgs(['--top', 'top1=constraint1', '--med', 'med1=constraint2', '--bot', 'bot3=constraint3'])
-        self.assertEqual(appArgs.top, {'top1': 'constraint1'})
-        self.assertEqual(appArgs.med, {'med1': 'constraint2'})
-        self.assertEqual(appArgs.bot, {'bot3': 'constraint3'})
+        appArgs = DP.parseArgs(['--top', 'top1=constraint1', '--med', 'med2=constraint2', '--bot', 'bot3=constraint3'])
+        self.assertEqual(appArgs.top[0].key, 'top1')
+        self.assertEqual(appArgs.top[0].value, 'constraint1')
+        self.assertEqual(appArgs.med[0].key, 'med2')
+        self.assertEqual(appArgs.med[0].value, 'constraint2')
+        self.assertEqual(appArgs.bot[0].key, 'bot3')
+        self.assertEqual(appArgs.bot[0].value, 'constraint3')
 
     # ex: DP.py -t t -m name,age
     def testCommaSeparatedValues(self):
         appArgs = DP.parseArgs(['-t', 'top1=t1', '-m', 'med1=m1,med2=m2'])
-        self.assertEqual(appArgs.top, {'top1': 't1'})
-        self.assertEqual(appArgs.med, {'med1': 'm1', 'med2': 'm2'})
+        self.assertEqual(appArgs.top[0].key, 'top1')
+        self.assertEqual(appArgs.top[0].value, 't1')
+
+        self.assertEqual(len(appArgs.med), 2)
+        self.assertEqual(appArgs.med[0].key, 'med1')
+        self.assertEqual(appArgs.med[0].value, 'm1')
+        self.assertEqual(appArgs.med[1].key, 'med2')
+        self.assertEqual(appArgs.med[1].value, 'm2')
 
     def testIncorrectHierarchy(self):
         # no args

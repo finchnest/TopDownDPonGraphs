@@ -2,6 +2,9 @@
 # a more developer-friendly with member variables.
 # AppArgs converts "key=value" in CLI to a dictionary of {'key': 'value'}
 
+from Constraint import Constraint
+from RelationalOp import RelationalOp
+
 class AppArgs:
     # permitted constraint values (placeholder)
     TOP_CONSTRAINTS = {'top1', 'top2'}
@@ -13,7 +16,7 @@ class AppArgs:
 
     def verify(self):
         self._verifyHierarchy()
-        self._convertDictToHierarchy()
+        self._convertArgsToHierarchy()
         self._checkValidKeys()
 
     # Verifies user passes arguments in a top down structure, ex:
@@ -30,12 +33,12 @@ class AppArgs:
         elif 'bot' in self._args and 'med' not in self._args:
             raise Exception('No mid-level contraint found. Use -m <med_constraint=value>')
 
-    def _convertDictToHierarchy(self):
-        self.top = self._convertDictToMemberVariable('top')
-        self.med = self._convertDictToMemberVariable('med')
-        self.bot = self._convertDictToMemberVariable('bot')
+    def _convertArgsToHierarchy(self):
+        self.top = self._convertArgsToMemberVariable('top')
+        self.med = self._convertArgsToMemberVariable('med')
+        self.bot = self._convertArgsToMemberVariable('bot')
 
-    def _convertDictToMemberVariable(self, key):
+    def _convertArgsToMemberVariable(self, key):
         if key not in self._args:
             return None # skip unspecified hierarchies
 
@@ -56,8 +59,14 @@ class AppArgs:
         if len(emptyValues) > 0:
             raise Exception('Unexpected syntax. Use name=value where value is non-empty')
 
-        # ex: convert [['k1', 'v1'], ['k2', 'v2']] into {'k1': 'v1', 'k2': 'v2'}
-        return dict(equalArgs)
+        # ex: convert [['k1', 'v1'], ['k2', 'v2']] into...
+        #   [Constraint1('k1', 'v1', <relop>), Constraint2('k2', 'v2', <relop>)]
+        constraints = []
+        for elem in equalArgs:
+            constraint = Constraint(elem[0], elem[1], RelationalOp.EQUAL)
+            constraints.append(constraint)
+
+        return constraints
 
     def _checkValidKeys(self):
         self._checkValidKey(self.top, self.TOP_CONSTRAINTS)
@@ -69,7 +78,7 @@ class AppArgs:
         if not member:
             return # nothing to check
 
-        s = set(member.keys())
-        if not s.union(permittedValues) == permittedValues:
+        keys = set([x.key for x in member])
+        if not keys.union(permittedValues) == permittedValues:
             sortedValues = sorted(list(permittedValues))
             raise Exception('Invalid keys found. Allowed keys are: ' + ' '.join(sortedValues))
