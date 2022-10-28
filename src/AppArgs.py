@@ -3,7 +3,6 @@
 # AppArgs converts "key=value" in CLI to a dictionary of {'key': 'value'}
 
 from Constraint import Constraint
-from RelationalOp import RelationalOp
 
 class AppArgs:
     # permitted constraint values (placeholder)
@@ -45,28 +44,7 @@ class AppArgs:
         # ex: convert 'k1=v1,k2=v2' into ['k1=v1', 'k2=v2']
         splitArgs = self._args[key].split(',')
 
-        # ex: convert ['k1=v1', 'k2=v2'] into [['k1', 'v1'], ['k2', 'v2']]
-        equalArgs = [x.split('=') for x in splitArgs]
-        lengths = [len(x) for x in equalArgs]
-
-        # check if any inputs were not in name=value syntax
-        oddLengths = [x for x in lengths if x % 2]
-        if len(oddLengths) > 0:
-            raise Exception('Unexpected syntax. Use name=value')
-
-        # check for empty values, ex: "name=" (no value)
-        emptyValues = [x for x in equalArgs if len(x[1]) == 0]
-        if len(emptyValues) > 0:
-            raise Exception('Unexpected syntax. Use name=value where value is non-empty')
-
-        # ex: convert [['k1', 'v1'], ['k2', 'v2']] into...
-        #   [Constraint1('k1', 'v1', <relop>), Constraint2('k2', 'v2', <relop>)]
-        constraints = []
-        for elem in equalArgs:
-            constraint = Constraint(elem[0], elem[1], RelationalOp.EQUAL)
-            constraints.append(constraint)
-
-        return constraints
+        return Constraint.convertArgsToConstraints(splitArgs)
 
     def _checkValidKeys(self):
         self._checkValidKey(self.top, self.TOP_CONSTRAINTS)
@@ -78,7 +56,7 @@ class AppArgs:
         if not member:
             return # nothing to check
 
-        keys = set([x.key for x in member])
+        keys = {x.key for x in member}
         if not keys.union(permittedValues) == permittedValues:
             sortedValues = sorted(list(permittedValues))
             raise Exception('Invalid keys found. Allowed keys are: ' + ' '.join(sortedValues))

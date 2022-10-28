@@ -27,6 +27,20 @@ class test_Constraint(unittest.TestCase):
         c = Constraint('key', 'val', RelationalOp.GREAT_THAN_EQ)
         self.assertEqual(c.relationalOp, RelationalOp.GREAT_THAN_EQ)
 
+    def testRelationalOperators(self):
+        # iterate over all supported relational operators:
+        # =, <, <=, >, >=
+        self.assertEqual(len(RelationalOp), 5)
+
+        for relop in RelationalOp:
+            with self.subTest():
+                s = ['top1' + relop.value + '10']
+                constraints = Constraint.convertArgsToConstraints(s)
+                self.assertEqual(len(constraints), 1)
+                constraint = constraints[0]
+                self.assertEqual(constraint.key, 'top1')
+                self.assertEqual(constraint.value, '10')
+                self.assertEqual(constraint.relationalOp, relop)
 
 if __name__ == '__main__':
 	unittest.main()

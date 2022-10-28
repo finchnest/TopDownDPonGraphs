@@ -5,7 +5,9 @@ import unittest
 # TODO: is there a better way?
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
+
 import DP
+from RelationalOp import RelationalOp
 
 class test_CommandLineInterface(unittest.TestCase):
 
@@ -52,6 +54,24 @@ class test_CommandLineInterface(unittest.TestCase):
         self.assertRaises(Exception, DP.parseArgs, ['-m', 'med1=m', '-b', 'bot1=b'])
         # top and bottom, but no medium
         self.assertRaises(Exception, DP.parseArgs, ['-t', 'top1=t', '-b', 'bot1=b'])
+
+    def testRelationalOperators(self):
+        appArgs = DP.parseArgs(['-t', 'top1>t1', '-m', 'med1<=m1,med2>=m2', '-b', 'bot1<b3'])
+        self.assertEqual(appArgs.top[0].key, 'top1')
+        self.assertEqual(appArgs.top[0].value, 't1')
+        self.assertEqual(appArgs.top[0].relationalOp, RelationalOp.GREAT_THAN)
+
+        self.assertEqual(appArgs.med[0].key, 'med1')
+        self.assertEqual(appArgs.med[0].value, 'm1')
+        self.assertEqual(appArgs.med[0].relationalOp, RelationalOp.LESS_THAN_EQ)
+
+        self.assertEqual(appArgs.med[1].key, 'med2')
+        self.assertEqual(appArgs.med[1].value, 'm2')
+        self.assertEqual(appArgs.med[1].relationalOp, RelationalOp.GREAT_THAN_EQ)
+
+        self.assertEqual(appArgs.bot[0].key, 'bot1')
+        self.assertEqual(appArgs.bot[0].value, 'b3')
+        self.assertEqual(appArgs.bot[0].relationalOp, RelationalOp.LESS_THAN)
 
 if __name__ == '__main__':
 	unittest.main()
