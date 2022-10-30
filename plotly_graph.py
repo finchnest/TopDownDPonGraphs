@@ -8,10 +8,13 @@ df = pd.read_csv('./toy_example_500.csv')
 missing = load_missing()
 graph = create_network(df, node_attributes, MAX_NODE, missing)
 
-
+edge_df = pd.read_csv('toy_example_edge_50.csv')
+src, tgt = edge_df['source'].tolist(), edge_df['target'].tolist()
 
 edge_trace = go.Scatter(
-    x=edge_x, y=edge_y,
+    x=src, y=tgt,
     line=dict(width=0.5, color='#888'),
     hoverinfo='none',
     mode='lines')
+
+

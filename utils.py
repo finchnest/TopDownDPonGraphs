@@ -13,7 +13,7 @@ from bokeh.io import output_notebook, show, save
 from bokeh.models import Range1d, Circle, ColumnDataSource, MultiLine
 from bokeh.plotting import figure
 from bokeh.plotting import from_networkx
-
+import matplotlib.pyplot as plt
 import random
 
 def search_missing():
@@ -28,9 +28,12 @@ def search_missing():
         for m in missing:
             f.write(str(m)+'\n')
 
-
+def simple_plot_with_idx(graph, save_path):
+    
+    networkx.draw_networkx(g)
+    plt.savefig(save_path)
+            
 def cleaning(df):
-
 
     # step 0: splitting certain columns
 
@@ -72,7 +75,6 @@ def cleaning(df):
     target_df = pd.DataFrame(target_data)
     target_df.to_csv('target_data.csv', index=False)
 
-
 def save_graph_edge(missing):
 
     with open('./soc-pokec-relationships.txt') as f:
@@ -84,7 +86,7 @@ def save_graph_edge(missing):
         if s not in missing and t not in missing:
             src.append(s)
             tgt.append(t)
-    
+
     data = {'source':src, 'target':tgt}
     df = pd.DataFrame(data)
     df.to_csv('./example_edge_20k.csv', index=False)
