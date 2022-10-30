@@ -1,3 +1,4 @@
+from dataclasses import replace
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
@@ -13,6 +14,81 @@ from bokeh.models import Range1d, Circle, ColumnDataSource, MultiLine
 from bokeh.plotting import figure
 from bokeh.plotting import from_networkx
 
+import random
+
+def search_missing():
+
+    df = pd.read_csv('./top_20000.csv')
+    missing = []
+    ids = df['user_id'].tolist()
+    for i in range(20000):
+        if i not in ids:
+            missing.append(i)
+    with open('./missing_20k.txt', 'wb') as f:
+        for m in missing:
+            f.write(str(m)+'\n')
+
+
+def cleaning(df):
+
+
+    # step 0: splitting certain columns
+
+    region = list(df['region'])
+    region_big = [r.split(', ')[0] for r in region]
+    region_small = [r.split(', ')[1] for r in region]
+    df['region_large'] = region_big
+    df['region_small'] = region_small
+
+    # step 1: cleaning null values
+    cols = df.columns
+
+    replace_dict = {c:[] for c in cols}
+
+    for i, row in df.iterrows():
+        for c in cols:
+            if row[c] == 'null':
+                replace_dict[c].append(i)
+    
+    for c in cols:
+        vals = df[c].unique()
+        try:
+            vals.remove('null')
+        except:
+            pass
+        for idx in replace_dict[c]:
+            df[c][idx] = random.choice(vals)
+    
+    # step 2: create height and weight
+    body = list(df['body'])
+    height = [b.split(', ')[0] for b in body]
+    weight = [b.split(', ')[1] for b in body]
+    df['height'] = region_big
+    df['weight'] = region_small
+
+    df.to_csv('clean_data_full.csv')
+    special = ['user_id', 'public', 'completion_percentage', 'gender', 'region', 'last_login', 'registration', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'height', 'weight', 'region_large', 'region_small']
+    target_data = {s:list(df[s]) for s in special}
+    target_df = pd.DataFrame(target_data)
+    target_df.to_csv('target_data.csv', index=False)
+
+
+def save_graph_edge(missing):
+
+    with open('./soc-pokec-relationships.txt') as f:
+        lines = f.readlines()
+    pairs = parse_relation(lines)
+    src, tgt = [], []
+    for p in pairs:
+        s,t = p[0], p[1]
+        if s not in missing and t not in missing:
+            src.append(s)
+            tgt.append(t)
+    
+    data = {'source':src, 'target':tgt}
+    df = pd.DataFrame(data)
+    df.to_csv('./example_edge_20k.csv', index=False)
+
 def parse_relation(relationships):
     res = []
     for line in relationships:
@@ -26,7 +102,7 @@ def parse_row(row):
     return row
 
 def load_missing():
-    with open('/Users/abeni/Projects/397-DP-Code/TopDownDPonGraphs/missing_users.txt', 'rb') as f:
+    with open('missing_users.txt', 'rb') as f:
         lines = f.readlines()
     lst = [int(l.replace(b'\n', b'')) for l in lines]
     return lst
@@ -39,7 +115,7 @@ def get_node_attribute(graph, node_index, attribute_key):
     
     return graph.nodes[node_index][attribute_key]
 
-def get_neighbor_information(edge_path='/Users/abeni/Projects/397-DP-Code/TopDownDPonGraphs/toy_example_edge_50.csv'):
+def get_neighbor_information(edge_path='toy_example_edge_50.csv'):
     
     missing_user = load_missing()
     edge_df = pd.read_csv(edge_path)
@@ -90,7 +166,7 @@ def row_to_dict(row, attr):
 
 def get_graph_edge(max_node=20, empty_user=[]):
     
-    edge_df = pd.read_csv('/Users/abeni/Projects/397-DP-Code/TopDownDPonGraphs/toy_example_edge_50.csv')
+    edge_df = pd.read_csv('toy_example_edge_50.csv')
     G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
     # print('Edge Amount of this graph:', len(edge_df))
     return G
