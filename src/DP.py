@@ -1,6 +1,7 @@
 from AppArgs import AppArgs
 import argparse
 import sys
+import BFS
 
 # verify input arguments using argparse and AppArgs
 def parseArgs(args):
@@ -26,10 +27,15 @@ def main():
     appArgs = parseArgs(sys.argv[1:])
 
     # debug purposes (delete when no longer necessary)
-    print(appArgs)
-    print(appArgs.top)
-    print(appArgs.med)
-    print(appArgs.bot)
+    # print(appArgs)
+    # print(appArgs.top)
+    # print(appArgs.med)
+    # print(appArgs.bot)
+
+    # forward command line arguments to the BFS search function
+
+    top_constraint_qualifers = BFS.preBFS(appArgs)
+    print(top_constraint_qualifers)
 
 if __name__ == '__main__':
     main()
