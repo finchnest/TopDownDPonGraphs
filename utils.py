@@ -94,5 +94,14 @@ def get_graph_edge(max_node=20, empty_user=[]):
     G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
     # print('Edge Amount of this graph:', len(edge_df))
     return G
+    
+def get_subgraph(graph, nodes):
 
-# load_missing()
+    # graph: oroginal graph
+    # nodes: a list of node indices in subgraph
+
+    subgraph = copy.copy(graph)
+    origin_nodes = graph.nodes
+    to_remove = [n for n in origin_nodes if n not in nodes]
+    subgraph.remove_nodes_from(to_remove)
+    return subgraph
