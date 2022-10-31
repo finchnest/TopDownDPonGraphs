@@ -20,10 +20,6 @@ mgraph = utils.create_network(df, vis_attributes, 50, missing)
 
 neighbor_info = utils.get_neighbor_information() 
 
-#test constrains
-top = {'public': '1'}
-med = {'gender': '0'}
-bot = {'bot1': '180', 'gender':'male'}
 
 def BFS(graph, source_node, constraint_dict, size=50):
 
