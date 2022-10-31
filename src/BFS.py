@@ -19,13 +19,14 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 # print(parent)
+# print(current)
 
 import utils 
 
 vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'region', 'last_login', 'registration', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies']
 
 missing = utils.load_missing()
-df = pd.read_csv('../toy_example_500.csv')
+df = pd.read_csv(parent+'/toy_example_500.csv')
 mgraph = utils.create_network(df, vis_attributes, 50, missing)
 
 neighbor_info = utils.get_neighbor_information() 
