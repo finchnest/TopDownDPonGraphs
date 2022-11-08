@@ -18,18 +18,19 @@ import random
 
 import os
 import sys
+import copy
 
 current = os.path.dirname(os.path.realpath(__file__))
 
 def search_missing():
 
-    df = pd.read_csv('./top_20000.csv')
+    df = pd.read_csv('./data/top_20000.csv')
     missing = []
     ids = df['user_id'].tolist()
     for i in range(20000):
         if i not in ids:
             missing.append(i)
-    with open('./missing_20k.txt', 'wb') as f:
+    with open('./data/missing_user.txt', 'wb') as f:
         for m in missing:
             f.write(str(m)+'\n')
 
@@ -109,7 +110,7 @@ def parse_row(row):
     return row
 
 def load_missing():
-    with open(current+'/missing_users.txt', 'rb') as f:
+    with open(current+'/data/missing_user.txt', 'rb') as f:
         lines = f.readlines()
     lst = [int(l.replace(b'\n', b'')) for l in lines]
     return lst
@@ -122,10 +123,10 @@ def get_node_attribute(graph, node_index, attribute_key):
     
     return graph.nodes[node_index][attribute_key]
 
-def get_neighbor_information(edge_path=current+'/toy_example_edge_50.csv'):
+def get_neighbor_information(edge_df):
     
     missing_user = load_missing()
-    edge_df = pd.read_csv(edge_path)
+    # edge_df = pd.read_csv(edge_path)
     src = edge_df['source'].tolist()
     tgt = edge_df['target'].tolist()
     
@@ -173,7 +174,7 @@ def row_to_dict(row, attr):
 
 def get_graph_edge(max_node=20, empty_user=[]):
     
-    edge_df = pd.read_csv(current+'/toy_example_edge_50.csv')
+    edge_df = pd.read_csv(current+'/data/example_edge_20k.csv')
     G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
     # print('Edge Amount of this graph:', len(edge_df))
     return G

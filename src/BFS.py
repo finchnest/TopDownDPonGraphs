@@ -23,15 +23,18 @@ sys.path.append(parent)
 
 import utils 
 
-vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'region', 'last_login', 'registration', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies']
+vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small','height', 'weight']
 
 missing = utils.load_missing()
-df = pd.read_csv(parent+'/toy_example_500.csv')
-mgraph = utils.create_network(df, vis_attributes, 50, missing)
+df = pd.read_csv(parent+'/data/target_data.csv')
+# print(df.head())
+# print(len(df['height']))
 
-neighbor_info = utils.get_neighbor_information() 
+mgraph = utils.create_network(df, vis_attributes, 20000, missing)
+edge_df = pd.read_csv(parent+'/data/example_edge_20k.csv')
+neighbor_info = utils.get_neighbor_information(edge_df) 
 
-size = 50
+size = 20000
 
 def preBFS(appArgs):
 
