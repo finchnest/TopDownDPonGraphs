@@ -63,3 +63,8 @@ node_matches = some_search_function(graph)
 
 subgraph = graph.subgraph(node_matches)
 ```
+
+## Data Download
+
+The user information and edge file is too large to be uploaded to github
+So I provide a link to download the data, please download the file via this [link](https://drive.google.com/drive/folders/19mcBxx2zZRDzyzJxk3lFayOxs_TKp1pI?usp=sharing)
