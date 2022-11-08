@@ -48,12 +48,12 @@ def cleaning(df):
 
     replace_dict = {c:[] for c in cols}
 
-    for i, row in df.iterrows():
+    for i, row in tqdm(df.iterrows(), desc='finding null values'):
         for c in cols:
-            if row[c] == 'null':
+            if row[c] == 'null' or row[c] == 'NaN' or row[c] == np.nan:
                 replace_dict[c].append(i)
     
-    for c in cols:
+    for c in tqdm(cols, desc='replacing null values'):
         vals = df[c].unique()
         try:
             vals.remove('null')
@@ -74,6 +74,8 @@ def cleaning(df):
     target_data = {s:list(df[s]) for s in special}
     target_df = pd.DataFrame(target_data)
     target_df.to_csv('target_data.csv', index=False)
+    print(target_df.head())
+    print(target_df['region_large'][0], target_df['region_small'][0], target_df['height'][0], target_df['weight'][0])
 
 def save_graph_edge(missing):
 
@@ -81,21 +83,22 @@ def save_graph_edge(missing):
         lines = f.readlines()
     pairs = parse_relation(lines)
     src, tgt = [], []
-    for p in pairs:
+    for p in tqdm(pairs):
         s,t = p[0], p[1]
-        if s not in missing and t not in missing:
+        if s not in missing and t not in missing and int(s) <= 20000 and int(s) <= 20000:
             src.append(s)
             tgt.append(t)
 
     data = {'source':src, 'target':tgt}
     df = pd.DataFrame(data)
+    print(df.head())
     df.to_csv('./example_edge_20k.csv', index=False)
 
 def parse_relation(relationships):
     res = []
     for line in relationships:
         line = line.split('\t')
-        res.append([line[0], line[1]])
+        res.append([line[0], line[1].replace('\n', '')])
     return res
 
 def parse_row(row):
@@ -168,9 +171,9 @@ def row_to_dict(row, attr):
 
 def get_graph_edge(max_node=20, empty_user=[]):
     
-    edge_df = pd.read_csv('toy_example_edge_50.csv')
+    edge_df = pd.read_csv('example_edge_20k.csv')
     G = networkx.from_pandas_edgelist(edge_df, 'source', 'target')
-    # print('Edge Amount of this graph:', len(edge_df))
+    print('Edge Amount of this graph:', len(edge_df))
     return G
 
 # load_missing()
