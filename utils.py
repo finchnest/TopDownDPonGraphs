@@ -107,7 +107,7 @@ def parse_row(row):
     return row
 
 def load_missing():
-    with open('missing_users.txt', 'rb') as f:
+    with open('missing_user.txt', 'rb') as f:
         lines = f.readlines()
     lst = [int(l.replace(b'\n', b'')) for l in lines]
     return lst
