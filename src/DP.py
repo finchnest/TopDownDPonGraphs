@@ -2,6 +2,25 @@ from AppArgs import AppArgs
 import argparse
 import sys
 import BFS
+import pandas as pd
+
+
+import os
+
+current = os.path.dirname(os.path.realpath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
+import GlobalSens
+import utils 
+
+vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
+
+missing = utils.load_missing()
+df = pd.read_csv(parent+'/data/target_data.csv')
+
+
+mgraph = utils.create_network(df, vis_attributes, 20000, missing)
 
 # verify input arguments using argparse and AppArgs
 def parseArgs(args):
@@ -34,11 +53,21 @@ def main():
 
     # forward command line arguments to the BFS search function
     
-    constraint_qualifers = BFS.preBFS(appArgs)
-    # print(BFS.BFS(BFS.mgraph, 1))
-    
-    population_count = constraint_qualifers[1]
-    print(population_count)
+    #value updated after a node removal
+
+    # updated above
+
+    # constraint_qualifers = BFS.preBFS(mgraph, appArgs)
+    # population_count = constraint_qualifers[1]
+    gs = GlobalSens.compute_global_sens('l1', appArgs)
+    print(gs)
+    # return population_count
+
+    #  result_x  = noise_add_func(population_count)
+
+    #fidelity check
+
+    # return to user
     
     #noise addition function takes population count as an argument    
     
