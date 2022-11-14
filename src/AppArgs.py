@@ -6,9 +6,9 @@ from Constraint import Constraint
 
 class AppArgs:
     # permitted constraint values (placeholder)
-    TOP_CONSTRAINTS = {'top1', 'top2'}
-    MED_CONSTRAINTS = {'med1', 'med2'}
-    BOT_CONSTRAINTS = {'bot1', 'bot2', 'bot3'}
+    TOP_CONSTRAINTS = {'region_large', 'top2'}
+    MED_CONSTRAINTS = {'region_small', 'med2'}
+    BOT_CONSTRAINTS = {'age', 'bot2', 'bot3'}
 
     def __init__(self, args: dict):
         self._args = args

@@ -11,7 +11,7 @@ import BFS
 class test_BFS(unittest.TestCase):
 
     def testPreBfs(self):
-        appArgs = DP.parseArgs(['-t', 'top1>=28'])
+        appArgs = DP.parseArgs(['-t', 'region_large=Nitra Region', -m, 'region=small=Zilina', -b, 'age>=32'])
         arr = BFS.preBFS(appArgs)
         self.assertEqual(arr[0], 3)
         self.assertEqual(arr[1], 6)
