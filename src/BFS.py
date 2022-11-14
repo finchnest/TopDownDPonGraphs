@@ -17,7 +17,7 @@ import utils
 vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
 
 missing = utils.load_missing()
-df = pd.read_csv(parent+'/data/target_data_2.csv')
+df = pd.read_csv(parent+'/data/target_data.csv')
 # print(df.head())
 # print(len(df['height']))
 
