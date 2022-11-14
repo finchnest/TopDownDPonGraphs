@@ -6,18 +6,19 @@ class Constraint():
         self.value = value
         self.relationalOp = relationalOp
 
-    # ex argList: ['region_large<30', 'top2>=40']
+    # ex input: ['region_large<30', 'top2>=40']
+    # ex output: [Constraint('region_large', '30', <), Constraint('top2', '40', >=)]
     @staticmethod
     def convertArgsToConstraints(argList: list):
         constraints = []
         for arg in argList:
 
             for relop in RelationalOp:
-                if relop.value in arg:
+                if relop.value[0] in arg:
                     relopType = relop
                     break
 
-            splitArgs = arg.split(relopType.value)
+            splitArgs = arg.split(relopType.value[0])
 
             # check if any inputs were not in name=value syntax
             if len(splitArgs) % 2 > 0:

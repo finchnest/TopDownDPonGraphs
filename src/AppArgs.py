@@ -8,7 +8,7 @@ class AppArgs:
     # permitted constraint values (placeholder)
     TOP_CONSTRAINTS = {'region_large', 'top2'}
     MED_CONSTRAINTS = {'region_small', 'med2'}
-    BOT_CONSTRAINTS = {'age', 'bot2', 'bot3'}
+    BOT_CONSTRAINTS = {'age', 'gender', 'bot3'}
 
     def __init__(self, args: dict):
         self._args = args

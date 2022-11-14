@@ -38,7 +38,7 @@ class test_AppArgs(unittest.TestCase):
     def testArgSplitHierarchy(self):
         args = {'top': 'region_large=t1,top2=10',
                 'med': 'region_small=m1',
-                'bot': 'age=b1,bot2=b2'}
+                'bot': 'age=b1,gender=b2'}
         appArgs = AppArgs(args)
         appArgs.verify()
         self.assertEqual(len(appArgs.top), 2)
@@ -58,7 +58,7 @@ class test_AppArgs(unittest.TestCase):
         self.assertEqual(appArgs.bot[0].key, 'age')
         self.assertEqual(appArgs.bot[0].value, 'b1')
         self.assertEqual(appArgs.bot[0].relationalOp, RelationalOp.EQUAL)
-        self.assertEqual(appArgs.bot[1].key, 'bot2')
+        self.assertEqual(appArgs.bot[1].key, 'gender')
         self.assertEqual(appArgs.bot[1].value, 'b2')
         self.assertEqual(appArgs.bot[1].relationalOp, RelationalOp.EQUAL)
 
