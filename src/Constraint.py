@@ -6,7 +6,7 @@ class Constraint():
         self.value = value
         self.relationalOp = relationalOp
 
-    # ex argList: ['top1<30', 'top2>=40']
+    # ex argList: ['region_large<30', 'top2>=40']
     @staticmethod
     def convertArgsToConstraints(argList: list):
         constraints = []

@@ -7,23 +7,14 @@ import random
 from RelationalOp import RelationalOp
 import copy
 
-
-
-# import os 
-# dir_path = os.path.dirname(os.path.realpath(__file__)) #src
-# from pathlib import Path
-# parent_folder = Path(dir_path).parent.absolute() #Top...
-
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 
-# print(parent)
-# print(current)
 
 import utils 
 
-vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small','height', 'weight']
+vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
 
 missing = utils.load_missing()
 df = pd.read_csv(parent+'/data/target_data.csv')
@@ -34,13 +25,37 @@ mgraph = utils.create_network(df, vis_attributes, 20000, missing)
 edge_df = pd.read_csv(parent+'/data/example_edge_20k.csv')
 neighbor_info = utils.get_neighbor_information(edge_df) 
 
+# print(mgraph.nodes[1])
+
+print(len(list(mgraph.nodes))) 
+print(len(df)) 
+
+ctr = 0
+def count_population():
+    return ctr
+
 size = 20000
 
 def preBFS(appArgs):
+    global top_key, top_value, med_key, med_value, bot_key, bot_value, bot_ops
 
-    return BFS(mgraph, mgraph.nodes[1]['user_id'], appArgs)
+    top_key = appArgs.top[0].key
+    top_value = appArgs.top[0].value
+    # top_ops = appArgs.top[0].relationalOp
 
-def BFS(graph, source_node, constraints):
+    med_key = appArgs.med[0].key
+    med_value = appArgs.med[0].value
+    # med_ops = appArgs.med[0].relationalOp
+
+    bot_key = appArgs.bot[0].key
+    bot_value = appArgs.bot[0].value
+    bot_ops = appArgs.bot[0].relationalOp
+
+    return BFS(mgraph, mgraph.nodes[1]['user_id'])
+
+
+
+def BFS(graph, source_node):
 
     # Mark all the vertices as not visited
     visited = [False] * (size)
@@ -53,34 +68,41 @@ def BFS(graph, source_node, constraints):
     while queue:
 
         current = queue.pop(0)
-        
-        # We know at least the top constraint is always defined so only check medium and bottom.
-        # The if check below is a placeholder for now until we finalize decision on constraint structure.
-        if(constraints):
-            # top_key = constraints.top[0].key
-            top_key = 'AGE'#for testing since there's no attribute called top1
-            top_value = constraints.top[0].value
-            top_ops = constraints.top[0].relationalOp
+           
+        if (bot_key):
+            if (graph.nodes[current][top_key] == top_value and graph.nodes[current][med_key] == med_value):
+                if(bot_ops == RelationalOp.EQUAL):
+                    if (graph.nodes[current][bot_key] == int(bot_value)):
+                        result.append(current)
+                        ctr += 1
 
-            if(top_ops == RelationalOp.EQUAL):
-                if (graph.nodes[current][top_key] == int(top_value)):
-                    result.append(current)
+                elif (bot_ops == RelationalOp.GREAT_THAN):
+                    if (graph.nodes[current][bot_key] > int(bot_value)):
+                        result.append(current)
+                        ctr += 1
 
-            elif (top_ops == RelationalOp.GREAT_THAN):
-                if (graph.nodes[current][top_key] > int(top_value)):
-                    result.append(current)
+                elif (bot_ops == RelationalOp.LESS_THAN):
+                    if (graph.nodes[current][bot_key] < int(bot_value)):
+                        result.append(current)
+                        ctr += 1
 
-            elif (top_ops == RelationalOp.LESS_THAN):
-                if (graph.nodes[current][top_key] < int(top_value)):
-                    result.append(current)
+                elif (bot_ops == RelationalOp.LESS_THAN_EQ):
+                    if (graph.nodes[current][bot_key] <= int(bot_value)):
+                        result.append(current)
+                        ctr += 1
 
-            elif (top_ops == RelationalOp.LESS_THAN_EQ):
-                if (graph.nodes[current][top_key] <= int(top_value)):
-                    result.append(current)
+                else:
+                    if (graph.nodes[current][bot_key] >= int(bot_value)):
+                        result.append(current)
+                        ctr += 1
+        else:
 
-            else:
-                if (graph.nodes[current][top_key] >= int(top_value)):
-                    result.append(current)
+            if (med_key and graph.nodes[current][top_key] == top_value and graph.nodes[current][med_key] == med_value):
+                result.append(current)
+                ctr += 1
+            elif(graph.nodes[current][top_key] == top_value):
+                result.append(current)
+                ctr += 1
 
 
         # Get all adjacent vertices of the
@@ -91,4 +113,3 @@ def BFS(graph, source_node, constraints):
                 visited[i - 1] = True 
     return result
 
-# top_constraint_qualifers = BFS(mgraph, mgraph.nodes[1]['user_id'], constraint_dict=top)
