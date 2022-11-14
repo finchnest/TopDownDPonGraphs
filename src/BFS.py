@@ -14,10 +14,10 @@ sys.path.append(parent)
 
 import utils 
 
-vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'AGE', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
+vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
 
 missing = utils.load_missing()
-df = pd.read_csv(parent+'/data/target_data.csv')
+df = pd.read_csv(parent+'/data/target_data_2.csv')
 # print(df.head())
 # print(len(df['height']))
 
@@ -27,14 +27,11 @@ neighbor_info = utils.get_neighbor_information(edge_df)
 
 # print(mgraph.nodes[1])
 
-print(len(list(mgraph.nodes))) 
-print(len(df)) 
+# print(len(list(mgraph.nodes))) 
+# print(len(df)) 
 
-ctr = 0
-def count_population():
-    return ctr
-
-size = 20000
+#the line below necessary b/c of inconsistencies in the .csv file.
+size = 20073
 
 def preBFS(appArgs):
     global top_key, top_value, med_key, med_value, bot_key, bot_value, bot_ops
@@ -69,47 +66,45 @@ def BFS(graph, source_node):
 
         current = queue.pop(0)
            
-        if (bot_key):
+        if (bot_key and graph.nodes[current]):
+            # print(graph.nodes[current])
             if (graph.nodes[current][top_key] == top_value and graph.nodes[current][med_key] == med_value):
                 if(bot_ops == RelationalOp.EQUAL):
                     if (graph.nodes[current][bot_key] == int(bot_value)):
                         result.append(current)
-                        ctr += 1
 
                 elif (bot_ops == RelationalOp.GREAT_THAN):
                     if (graph.nodes[current][bot_key] > int(bot_value)):
                         result.append(current)
-                        ctr += 1
 
                 elif (bot_ops == RelationalOp.LESS_THAN):
                     if (graph.nodes[current][bot_key] < int(bot_value)):
                         result.append(current)
-                        ctr += 1
 
                 elif (bot_ops == RelationalOp.LESS_THAN_EQ):
                     if (graph.nodes[current][bot_key] <= int(bot_value)):
                         result.append(current)
-                        ctr += 1
 
                 else:
                     if (graph.nodes[current][bot_key] >= int(bot_value)):
                         result.append(current)
-                        ctr += 1
         else:
 
-            if (med_key and graph.nodes[current][top_key] == top_value and graph.nodes[current][med_key] == med_value):
+            if (graph.nodes[current] and med_key and graph.nodes[current][top_key] == top_value and graph.nodes[current][med_key] == med_value):
                 result.append(current)
-                ctr += 1
-            elif(graph.nodes[current][top_key] == top_value):
+            elif(graph.nodes[current] and graph.nodes[current][top_key] == top_value):
                 result.append(current)
-                ctr += 1
 
 
         # Get all adjacent vertices of the
         # dequeued vertex.
         for i in neighbor_info[current]:
+            # print(i)
+            #the line below necessary b/c of inconsistencies in the .csv file.
+            if(i >= 20073):
+                continue
             if visited[i - 1] == False:
                 queue.append(i)
                 visited[i - 1] = True 
-    return result
+    return (result, len(result))
 
