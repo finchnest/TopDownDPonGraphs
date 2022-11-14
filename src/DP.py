@@ -33,9 +33,15 @@ def main():
     # print(appArgs.bot)
 
     # forward command line arguments to the BFS search function
-
-    top_constraint_qualifers = BFS.preBFS(appArgs)
-    print(top_constraint_qualifers)
+    
+    constraint_qualifers = BFS.preBFS(appArgs)
+    # print(BFS.BFS(BFS.mgraph, 1))
+    
+    population_count = constraint_qualifers[1]
+    print(population_count)
+    
+    #noise addition function takes population count as an argument    
+    
 
 if __name__ == '__main__':
     main()

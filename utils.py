@@ -21,6 +21,7 @@ import sys
 import copy
 
 current = os.path.dirname(os.path.realpath(__file__))
+print(current)
 
 def search_missing():
 
@@ -196,14 +197,14 @@ def get_subgraph(graph, nodes):
     return subgraph
 
 def load_missing():
-    with open('./data/missing_user.txt') as f:
+    with open(current+'/data/missing_user.txt') as f:
         lines = f.readlines()
     lst = [int(l.replace('\n', '')) for l in lines]
     return lst
 
 
-def multi_filtering(df_filtered = df[(df['Industry']=='Tech')&(df['Shares']>=100)]):
+# def multi_filtering(df_filtered = df[(df['Industry']=='Tech')&(df['Shares']>=100)]):
     
 
-# missing = load_missing()
-# save_graph_edge(missing)
+# # missing = load_missing()
+# # save_graph_edge(missing)
