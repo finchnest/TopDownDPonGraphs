@@ -201,5 +201,9 @@ def load_missing():
     lst = [int(l.replace('\n', '')) for l in lines]
     return lst
 
+
+def multi_filtering(df_filtered = df[(df['Industry']=='Tech')&(df['Shares']>=100)]):
+    
+
 # missing = load_missing()
 # save_graph_edge(missing)
