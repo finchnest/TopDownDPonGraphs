@@ -83,15 +83,20 @@ def cleaning(df):
 
 def save_graph_edge(missing):
 
+    data_df = pd.read_csv('./data/target_data.csv')
+    user_ids = data_df['user_id'].tolist()
+    user_ids = [int(i) for i in user_ids]
     with open('./soc-pokec-relationships.txt') as f:
         lines = f.readlines()
     pairs = parse_relation(lines)
     src, tgt = [], []
-    for p in pairs:
-        s,t = p[0], p[1]
-        if s not in missing and t not in missing:
-            src.append(s)
-            tgt.append(t)
+    for p in tqdm(pairs):
+        s,t = int(p[0]), int(p[1])
+        if s <= 20073 and t <= 20073:
+            if s not in missing and t not in missing:
+                if s in user_ids and t in user_ids:
+                    src.append(int(s))
+                    tgt.append(int(t))
 
     data = {'source':src, 'target':tgt}
     df = pd.DataFrame(data)
@@ -189,3 +194,12 @@ def get_subgraph(graph, nodes):
     to_remove = [n for n in origin_nodes if n not in nodes]
     subgraph.remove_nodes_from(to_remove)
     return subgraph
+
+def load_missing():
+    with open('./data/missing_user.txt') as f:
+        lines = f.readlines()
+    lst = [int(l.replace('\n', '')) for l in lines]
+    return lst
+
+# missing = load_missing()
+# save_graph_edge(missing)
