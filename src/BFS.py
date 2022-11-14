@@ -14,26 +14,15 @@ sys.path.append(parent)
 
 import utils 
 
-vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
 
-missing = utils.load_missing()
-df = pd.read_csv(parent+'/data/target_data.csv')
-# print(df.head())
-# print(len(df['height']))
-
-mgraph = utils.create_network(df, vis_attributes, 20000, missing)
 edge_df = pd.read_csv(parent+'/data/example_edge_20k.csv')
 neighbor_info = utils.get_neighbor_information(edge_df) 
 
-# print(mgraph.nodes[1])
-
-# print(len(list(mgraph.nodes))) 
-# print(len(df)) 
 
 #the line below necessary b/c of inconsistencies in the .csv file.
 size = 20073
 
-def preBFS(appArgs):
+def preBFS(mgraph, appArgs):
     global top_key, top_value, med_key, med_value, bot_key, bot_value, bot_ops
 
     top_key = appArgs.top[0].key
