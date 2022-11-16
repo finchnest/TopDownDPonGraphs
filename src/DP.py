@@ -1,10 +1,7 @@
 from AppArgs import AppArgs
 import argparse
 import sys
-import BFS
 import pandas as pd
-
-
 import os
 
 current = os.path.dirname(os.path.realpath(__file__))
@@ -12,9 +9,11 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 import GlobalSens
-import utils 
+import utils
 
-vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
+vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login',
+                  'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies',
+                  'region_large', 'region_small', 'height', 'weight']
 
 missing = utils.load_missing()
 df = pd.read_csv(parent+'/data/target_data.csv')
@@ -52,7 +51,7 @@ def main():
     # print(appArgs.bot)
 
     # forward command line arguments to the BFS search function
-    
+
     #value updated after a node removal
 
     # updated above
@@ -68,9 +67,9 @@ def main():
     #fidelity check
 
     # return to user
-    
-    #noise addition function takes population count as an argument    
-    
+
+    #noise addition function takes population count as an argument
+
 
 if __name__ == '__main__':
     main()

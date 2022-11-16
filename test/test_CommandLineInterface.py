@@ -13,23 +13,23 @@ class test_CommandLineInterface(unittest.TestCase):
 
     # short form: -t, -m, -b
     def testShortForm(self):
-        appArgs = DP.parseArgs(['-t', 'region_large=constraint1', '-m', 'med2=constraint2', '-b', 'bot3=constraint3'])
+        appArgs = DP.parseArgs(['-t', 'region_large=constraint1', '-m', 'med2=constraint2', '-b', 'hobbies=constraint3'])
         self.assertEqual(appArgs.top[0].key, 'region_large')
         self.assertEqual(appArgs.top[0].value, 'constraint1')
         self.assertEqual(appArgs.med[0].key, 'med2')
         self.assertEqual(appArgs.med[0].value, 'constraint2')
-        self.assertEqual(appArgs.bot[0].key, 'bot3')
+        self.assertEqual(appArgs.bot[0].key, 'hobbies')
         self.assertEqual(appArgs.bot[0].value, 'constraint3')
 
     # long form: --top, --med, --bottom
     def testLongForm(self):
-        appArgs = DP.parseArgs(['--top', 'region_large=constraint1', '--med', 'med2=constraint2', '--bot', 'bot3=constraint3'])
+        appArgs = DP.parseArgs(['--top', 'region_large=constraint1', '--med', 'med2=constraint2', '--bot', 'height=175 cm'])
         self.assertEqual(appArgs.top[0].key, 'region_large')
         self.assertEqual(appArgs.top[0].value, 'constraint1')
         self.assertEqual(appArgs.med[0].key, 'med2')
         self.assertEqual(appArgs.med[0].value, 'constraint2')
-        self.assertEqual(appArgs.bot[0].key, 'bot3')
-        self.assertEqual(appArgs.bot[0].value, 'constraint3')
+        self.assertEqual(appArgs.bot[0].key, 'height')
+        self.assertEqual(appArgs.bot[0].value, '175 cm')
 
     # ex: DP.py -t t -m name,age
     def testCommaSeparatedValues(self):

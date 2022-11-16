@@ -5,11 +5,6 @@
 from Constraint import Constraint
 
 class AppArgs:
-    # permitted constraint values (placeholder)
-    TOP_CONSTRAINTS = {'region_large', 'top2'}
-    MED_CONSTRAINTS = {'region_small', 'med2'}
-    BOT_CONSTRAINTS = {'age', 'gender', 'bot3'}
-
     def __init__(self, args: dict):
         self._args = args
 
@@ -47,9 +42,9 @@ class AppArgs:
         return Constraint.convertArgsToConstraints(splitArgs)
 
     def _checkValidKeys(self):
-        self._checkValidKey(self.top, self.TOP_CONSTRAINTS)
-        self._checkValidKey(self.med, self.MED_CONSTRAINTS)
-        self._checkValidKey(self.bot, self.BOT_CONSTRAINTS)
+        self._checkValidKey(self.top, Constraint.TOP_CONSTRAINTS)
+        self._checkValidKey(self.med, Constraint.MED_CONSTRAINTS)
+        self._checkValidKey(self.bot, Constraint.BOT_CONSTRAINTS)
 
     # check if all user-specified keys equal permitted keys
     def _checkValidKey(self, member, permittedValues):
