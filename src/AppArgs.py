@@ -34,7 +34,7 @@ class AppArgs:
 
     def _convertArgsToMemberVariable(self, key):
         if key not in self._args:
-            return None # skip unspecified hierarchies
+            return [] # skip unspecified hierarchies
 
         # ex: convert 'k1=v1,k2=v2' into ['k1=v1', 'k2=v2']
         splitArgs = self._args[key].split(',')

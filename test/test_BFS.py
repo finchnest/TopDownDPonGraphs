@@ -62,5 +62,10 @@ class test_BFS(unittest.TestCase):
         self.assertEqual(arr[4], 18911)
         self.assertEqual(arr[5], 15091)
 
+    def testEmptySubstring(self):
+        appArgs = DP.parseArgs(['-t', 'region_large=Zil', '-m', 'region_small=Zil'])
+        arr = BFS(mgraph, appArgs)
+        self.assertEqual(len(arr), 0)
+
 if __name__ == '__main__':
 	unittest.main()
