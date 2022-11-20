@@ -3,7 +3,7 @@ import argparse
 import sys
 import BFS
 import pandas as pd
-
+import numpy as np
 
 import os
 
@@ -13,6 +13,8 @@ sys.path.append(parent)
 
 import GlobalSens
 import utils 
+import noise
+import matplotlib.pyplot as plt
 
 vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login', 'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies', 'region_large', 'region_small', 'height', 'weight']
 
@@ -60,7 +62,22 @@ def main():
     # constraint_qualifers = BFS.preBFS(mgraph, appArgs)
     # population_count = constraint_qualifers[1]
     gs = GlobalSens.compute_global_sens('l1', appArgs)
-    print(gs)
+    dif = []
+    epsilons = [i for i in range(0, 5, 0.1)]
+    
+    for e in epsilons:
+        n = 0
+        for _ in range(5):
+            sigma = (2*np.log(1.25/1))/(e**2)
+            q = BFS.BFS(mgraph, appArgs)[0]
+            n += noise.sample_dgauss(sigma)
+        n = n / 5
+        dif.append(n)
+
+    plt.plot(epsilons, n)
+    plt.show()
+    plt.savefig('epsilons.png')
+
     # return population_count
 
     #  result_x  = noise_add_func(population_count)
