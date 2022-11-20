@@ -34,7 +34,7 @@ class test_Constraint(unittest.TestCase):
 
         for relop in RelationalOp:
             with self.subTest():
-                s = ['region_large' + relop.value[0] + '10']
+                s = ['region_large' + relop.value + '10']
                 constraints = Constraint.convertArgsToConstraints(s)
                 self.assertEqual(len(constraints), 1)
                 constraint = constraints[0]

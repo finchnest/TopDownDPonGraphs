@@ -32,13 +32,13 @@ def BFS(graph, appArgs):
             continue
 
         # check all top constraints using relational operator
-        topPass = all(top.relationalOp.value[1](node[top.key], top.value) for top in appArgs.top)
+        topPass = all(top.opFcn(node[top.key], top.value) for top in appArgs.top)
 
         # check all med constraints using relational operator
-        medPass = all(med.relationalOp.value[1](node[med.key], med.value) for med in appArgs.med)
+        medPass = all(med.opFcn(node[med.key], med.value) for med in appArgs.med)
 
         # check all bot constraints using relational operator
-        botPass = all(bot.relationalOp.value[1](node[bot.key], int(bot.value)) for bot in appArgs.bot)
+        botPass = all(bot.opFcn(bot.castFcn(node[bot.key]), bot.castFcn(bot.value)) for bot in appArgs.bot)
 
         # add current if all checks passed
         if topPass and medPass and botPass:

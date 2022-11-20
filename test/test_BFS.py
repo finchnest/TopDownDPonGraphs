@@ -10,7 +10,7 @@ sys.path.append(parent)
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'src'))
 
 import DP
-import BFS
+from BFS import BFS
 import utils
 
 vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login',
@@ -27,7 +27,7 @@ class test_BFS(unittest.TestCase):
 
     def testBfs(self):
         appArgs = DP.parseArgs(['-t', 'region_large=Nitra Region', '-m', 'region_small=Nitra', '-b', 'age>=32'])
-        arr = BFS.BFS(mgraph, appArgs)
+        arr = BFS(mgraph, appArgs)
         self.assertEqual(len(arr), 5)
         self.assertEqual(arr[0], 15494)
         self.assertEqual(arr[1], 14141)
@@ -37,12 +37,35 @@ class test_BFS(unittest.TestCase):
 
     def testBfsMultipleBottomConstraints(self):
         appArgs = DP.parseArgs(['-t', 'region_large=abroad', '-m', 'region_small=abroad - others', '-b', 'age>35,gender=1'])
-        arr = BFS.BFS(mgraph, appArgs)
+        arr = BFS(mgraph, appArgs)
         self.assertEqual(len(arr), 4)
         self.assertEqual(arr[0], 3734)
         self.assertEqual(arr[1], 7204)
         self.assertEqual(arr[2], 19815)
         self.assertEqual(arr[3], 13875)
+
+    def testHobbies(self):
+        appArgs = DP.parseArgs(['-t', 'region_large=Zilina Region', '-m', 'region_small=Kysucke New Town', '-b', 'hobbies=technology'])
+        arr = BFS(mgraph, appArgs)
+        self.assertEqual(len(arr), 2)
+        self.assertEqual(arr[0], 53)
+        self.assertEqual(arr[1], 16534)
+
+    def testHeight(self):
+        appArgs = DP.parseArgs(['-t', 'region_large=Zilina Region', '-m', 'region_small=Kysucke New Town', '-b', 'height>202'])
+        arr = BFS(mgraph, appArgs)
+        self.assertEqual(len(arr), 6)
+        self.assertEqual(arr[0], 636)
+        self.assertEqual(arr[1], 2982)
+        self.assertEqual(arr[2], 3353)
+        self.assertEqual(arr[3], 2314)
+        self.assertEqual(arr[4], 18911)
+        self.assertEqual(arr[5], 15091)
+
+    def testEmptySubstring(self):
+        appArgs = DP.parseArgs(['-t', 'region_large=Zil', '-m', 'region_small=Zil'])
+        arr = BFS(mgraph, appArgs)
+        self.assertEqual(len(arr), 0)
 
 if __name__ == '__main__':
 	unittest.main()
