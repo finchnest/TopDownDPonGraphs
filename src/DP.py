@@ -66,6 +66,9 @@ def main():
     for e in epsilons:
         n = 0
         for _ in range(5):
+            # epsilon should not be 0
+            assert e != 0.0
+            
             sigma = (2*np.log(1.25/1))/(e**2)
             q = BFS.BFS(mgraph, appArgs)[0]
             n += abs(noise.sample_dgauss(sigma))
