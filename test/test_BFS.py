@@ -79,5 +79,14 @@ class test_BFS(unittest.TestCase):
         self.assertEqual(arr[0], 2191)
         self.assertEqual(arr[1], 15936)
 
+    def testWeight(self):
+        appArgs = DP.parseArgs(['-t', 'region_large=Zilina Region', '-m', 'region_small=Kysucke New Town',
+                                '-b', 'weight>=99,age>35'])
+        arr = BFS(mgraph, appArgs)
+        self.assertEqual(len(arr), 3)
+        self.assertEqual(arr[0], 4694)
+        self.assertEqual(arr[1], 17617)
+        self.assertEqual(arr[2], 15091)
+
 if __name__ == '__main__':
 	unittest.main()

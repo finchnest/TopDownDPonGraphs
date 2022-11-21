@@ -6,7 +6,7 @@ class Constraint():
     # permitted constraint values
     TOP_CONSTRAINTS = {'region_large', 'top2'}
     MED_CONSTRAINTS = {'region_small', 'med2'}
-    BOT_CONSTRAINTS = {'age', 'gender', 'hobbies', 'height'} # todo: add more here
+    BOT_CONSTRAINTS = {'age', 'gender', 'hobbies', 'height', 'weight'} # todo: add more here
 
     def __init__(self, key: str, value: str, relationalOp: RelationalOp):
         self.key = key
@@ -40,8 +40,9 @@ class Constraint():
         # todo: add other bottom args here
         if self.key in ['age', 'gender']:
             castFcn = int
-        elif self.key == 'height':
+        elif self.key in ['height', 'weight']:
             # ex: convert '175 cm' to 175 (int)
+            # or '90 kg' to 90 (int)
             castFcn = lambda x : int(re.findall(r'\d+', x)[0])
         else:
             castFcn = str
