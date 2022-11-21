@@ -1,50 +1,25 @@
-import BFS
-import utils
-import math
+from BFS import BFS
 import pandas as pd
-from RelationalOp import RelationalOp
-from tqdm import tqdm
+import utils
 
-def test_filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, low_ops):
-    
-    if low_ops == RelationalOp.EQUAL:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]==bot_value)]
-    elif low_ops == RelationalOp.GREAT_THAN_EQ:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]>=bot_value)]
-    elif low_ops == RelationalOp.LESS_THAN_EQ:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]<=bot_value)]
-    elif low_ops == RelationalOp.LESS_THAN:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]<bot_value)]
-    elif low_ops == RelationalOp.GREAT_THAN:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]>bot_value)]
-    return df_filtered
-
-
-def compute_global_sens(norm, appArgs, method='count'):
-
-    df = pd.read_csv('../data/target_data.csv')
+def compute_global_sens(filePath, norm, appArgs, method='count'):
     assert norm in ['l1', 'l2']
+    vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login',
+                  'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies',
+                  'region_large', 'region_small', 'height', 'weight']
 
-    top_key = appArgs.top[0].key
-    top_value = appArgs.top[0].value
+    missing = utils.load_missing()
+    df = pd.read_csv(filePath)
+    graph = utils.create_network(df, vis_attributes, 20000, missing)
 
-    med_key = appArgs.med[0].key
-    med_value = appArgs.med[0].value
-
-    bot_key = appArgs.bot[0].key
-    bot_value = appArgs.bot[0].value
-    bot_ops = appArgs.bot[0].relationalOp
-
-    all_diffs = []
-    ds_origin = test_filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, bot_ops)
+    ds_origin = BFS(graph, appArgs)
     original_query = len(ds_origin)
 
     if method == 'count':
-        if original_query == 0:
-            return 0
-        else:
-            return 1
+        return int(original_query > 0)
 
+    assert False, 'Untested and slow'
+    """
     for i in tqdm(range(len(df))):
         ds_prime = df.copy().T
         ds_prime.pop(i)
@@ -54,9 +29,10 @@ def compute_global_sens(norm, appArgs, method='count'):
         if norm == 'l2':
             dif = dif*dif
         all_diffs.append(dif)
-        
+
     if norm == 'l1':
         return max(all_diffs)
     else:
         all_diffs = [math.sqrt(dif) for dif in all_diffs]
         return max(all_diffs)
+    """

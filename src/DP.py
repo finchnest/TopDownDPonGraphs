@@ -10,7 +10,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 
 import GlobalSens
-import utils 
+import utils
 import noise
 import matplotlib.pyplot as plt
 import BFS
@@ -45,32 +45,18 @@ def main():
     # forward command line arguments to be validated (sys.argv)
     appArgs = parseArgs(sys.argv[1:])
 
-    # debug purposes (delete when no longer necessary)
-    # print(appArgs)
-    # print(appArgs.top)
-    # print(appArgs.med)
-    # print(appArgs.bot)
-
-    # forward command line arguments to the BFS search function
-
-    #value updated after a node removal
-
-    # updated above
-
-    # constraint_qualifers = BFS.preBFS(mgraph, appArgs)
-    # population_count = constraint_qualifers[1]
-    gs = GlobalSens.compute_global_sens('l1', appArgs)
+    #  global sensitivity
+    gs = GlobalSens.compute_global_sens('../data/target_data.csv', 'l1', appArgs)
     dif = []
     epsilons = [i for i in np.arange(0.01, 1.01, 0.1)]
-    
+    # epsilon should not be 0
+    assert not any(e == 0 for e in epsilons)
+
     for e in epsilons:
         n = 0
         for _ in range(5):
-            # epsilon should not be 0
-            assert e != 0.0
-            
-            sigma = (2*np.log(1.25/1))/(e**2)
-            q = BFS.BFS(mgraph, appArgs)[0]
+            sigma = (2*np.log(1.25/1)*(gs**2))/(e**2)
+            #q = BFS.BFS(mgraph, appArgs)[0]
             n += abs(noise.sample_dgauss(sigma))
         n = n / 5
         dif.append(n)
