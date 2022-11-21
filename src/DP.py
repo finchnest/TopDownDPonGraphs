@@ -13,15 +13,12 @@ import GlobalSens
 import utils 
 import noise
 import matplotlib.pyplot as plt
+import BFS
 
-
-vis_attributes = ['user_id', 'public', 'completion_percentage', 'gender', 'last_login',
-                  'age', 'body', 'I_am_working_in_field', 'spoken_languages', 'hobbies',
-                  'region_large', 'region_small', 'height', 'weight']
+vis_attributes = ['gender', 'region_large', 'region_small', 'age', 'weight', 'height', 'hobbies', 'user_id']
 
 missing = utils.load_missing()
-df = pd.read_csv(parent+'/data/target_data.csv')
-
+df = pd.read_csv(parent+'/data/anonymized_data.csv')
 
 mgraph = utils.create_network(df, vis_attributes, 20000, missing)
 
@@ -64,20 +61,22 @@ def main():
     # population_count = constraint_qualifers[1]
     gs = GlobalSens.compute_global_sens('l1', appArgs)
     dif = []
-    epsilons = [i for i in range(0, 5, 0.1)]
+    epsilons = [i for i in np.arange(0.01, 1.01, 0.1)]
     
     for e in epsilons:
         n = 0
         for _ in range(5):
             sigma = (2*np.log(1.25/1))/(e**2)
             q = BFS.BFS(mgraph, appArgs)[0]
-            n += noise.sample_dgauss(sigma)
+            n += abs(noise.sample_dgauss(sigma))
         n = n / 5
         dif.append(n)
 
-    plt.plot(epsilons, n)
+    plt.plot(epsilons,dif)
     plt.show()
     plt.savefig('epsilons.png')
+
+    # Please try: python DP.py -t region_large="Zilina Region" -m region_small="Kysucke New Town" -b hobbies="music"
 
     # return population_count
 

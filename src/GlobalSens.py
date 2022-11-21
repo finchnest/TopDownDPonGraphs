@@ -8,15 +8,15 @@ from tqdm import tqdm
 def test_filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, low_ops):
     
     if low_ops == RelationalOp.EQUAL:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]==int(bot_value))]
+        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]==bot_value)]
     elif low_ops == RelationalOp.GREAT_THAN_EQ:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]>=int(bot_value))]
+        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]>=bot_value)]
     elif low_ops == RelationalOp.LESS_THAN_EQ:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]<=int(bot_value))]
+        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]<=bot_value)]
     elif low_ops == RelationalOp.LESS_THAN:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]<int(bot_value))]
+        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]<bot_value)]
     elif low_ops == RelationalOp.GREAT_THAN:
-        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]>int(bot_value))]
+        df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]>bot_value)]
     return df_filtered
 
 
@@ -27,11 +27,9 @@ def compute_global_sens(norm, appArgs, method='count'):
 
     top_key = appArgs.top[0].key
     top_value = appArgs.top[0].value
-    # top_ops = appArgs.top[0].relationalOp
 
     med_key = appArgs.med[0].key
     med_value = appArgs.med[0].value
-    # med_ops = appArgs.med[0].relationalOp
 
     bot_key = appArgs.bot[0].key
     bot_value = appArgs.bot[0].value

@@ -63,3 +63,6 @@ node_matches = some_search_function(graph)
 
 subgraph = graph.subgraph(node_matches)
 ```
+
+To run the search function, run <br>
+`python DP.py -t region_large="Zilina Region" -m region_small="Kysucke New Town" -b hobbies="music"`

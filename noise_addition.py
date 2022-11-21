@@ -35,18 +35,20 @@ cols = list(df.columns)
 def add_noise_to_hist(df):
 
     hist = df.groupby(list(df.columns)).size().reset_index(name='count')
-    print(hist.head())
     counts = list(hist['count'])
-    sampled_noise = [noise.sample_dgauss(1) for _ in counts]
+    sampled_noise = [noise.sample_dgauss(0.5) for _ in counts]
     noisy_counts = []
     noisy_counts_pp = []
+
+    # sampling noise and add to count, also change the negative count to 0(equals to drop)
     for i in range(len(counts)):
         nc = counts[i] + sampled_noise[i]
-        noisy_counts.append(nc)
+        noisy_counts.append(nc) # no post-processing (containing negative counts)
         if nc < 0:
             nc = 0
-        noisy_counts_pp.append(nc)
+        noisy_counts_pp.append(nc) # with post-processing (no negative counts)
     
+    # iterating over noisy_counts and try to add or remove count randomly until the sum of noisy_counts equals to sum(counts)
     noisy_counts_exact = noisy_counts
     noisy_counts_pp_exact = noisy_counts_pp
     while(sum(noisy_counts_exact) != sum(counts)):
@@ -67,6 +69,7 @@ def add_noise_to_hist(df):
             elif sum(noisy_counts_pp_exact) > sum(counts):
                 noisy_counts_pp_exact[i] += 1
 
+    # add new data to dataframe
     hist['noise_count'] = noisy_counts
     hist['noise_count_pp'] = noisy_counts_pp
     hist['noise_count_pp_exact'] = noisy_counts_pp_exact
@@ -74,51 +77,39 @@ def add_noise_to_hist(df):
     return hist
 
 
-with_noise = add_noise_to_hist(df)
-check_hobby = ['internet', 'sleeping', 'reading', 'dance', 'games', 'sports', 'movies', 'party', 'swim', 'traveling', 'music', 'discos']
-
-def find_count(df, col):
+def find_count(df, col, attr='anony_hobby'):
     
-    check_hobby = [ 'sleeping', 'reading', 'dance', 'games', 'sports', 'movies', 'party', 'swim', 'traveling', 'music']
-    data = {}
-    for i, row in with_noise.iterrows():
-        h = str(row['anony_hobby'])
-        if h in check_hobby:
-            if h in list(data.keys()):
-                data[h] += int(row[col])
-            else:
-                data[h] = int(row[col])
-    return data
+    # only consider some values in the attribute (if considering all, then it won't fit in the figure)
+    if attr == 'anony_hobby':
+        good_h = [ 'sleeping', 'reading', 'dance', 'games', 'sports', 'movies', 'party', 'swim', 'traveling', 'music']
+    elif attr == 'anony_height':
+        good_h = ['13X', '14X', '15X', '16X', '17X', '18X', '19X', '20X', '21X']
+    elif attr == 'anony_weight':
+        good_h = ['3X', '4X', '5X', '6X', '7X', '8X', '9X', '10X', '11X', '12X']
+    elif attr == 'anony_age':
+        good_h = ['0X', '1X', '2X', '3X', '4X', '5X', '6X', '7X', '8X', '9X']
 
-def find_count_h(df, col):
-    
-    good_h = ['13X', '14X', '15X', '16X', '17X', '18X', '19X', '20X', '21X']
-    # good_h = ['3X', '4X', '5X', '6X', '7X', '8X', '9X', '10X', '11X', '12X']
-    # good_h = ['0X', '1X', '2X', '3X', '4X', '5X', '6X', '7X', '8X', '9X']
+    # checking whether the value is in good_h
     data = {}
-    for i, row in with_noise.iterrows():
-        h = str(row['anony_height'])
+    for i, row in df.iterrows():
+        h = str(row[attr])
         if h in good_h:
             if h in list(data.keys()):
                 data[h] += int(row[col])
             else:
                 data[h] = int(row[col])
-
     return data
 
-def make_cumulative_h(col):
+def make_cumulative(df, attr):
 
-    # ['count', 'noise_count', 'noise_count_pp', 'noise_count_exact', 'noise_count_pp_exact']
-    width = 0.2
     all_data = []
     for c in ['count', 'noise_count', 'noise_count_pp', 'noise_count_exact', 'noise_count_pp_exact']:
-        all_data.append(find_count_h(with_noise, c))
-    # print(all_data)
+        all_data.append(find_count(df, c, attr))
     vals = []
-    for i, d in enumerate(all_data):
-        
-        val = []
 
+    # transform data into compatible format for histograms plot
+    for i, d in enumerate(all_data):    
+        val = []
         x = list(all_data[i].keys())
         y = list(all_data[i].values())
         for j, k in enumerate(x):
@@ -126,37 +117,7 @@ def make_cumulative_h(col):
                 val.append(k)
         vals.append(val)
     
-    fig, ax = plt.subplots()
-    counts, edges, bars = ax.hist(vals, label=['count', 'noise_count', 'noise_count_pp', 'noise_count_exact', 'noise_count_pp_exact'], linewidth=2, orientation='horizontal')
-    for b in bars:
-        ax.bar_label(b, fontsize=6)
-
-    # plt.xticks(rotation=45, fontsize=8)
-    # plt.ylabel('counts')
-    # plt.legend(loc='best')
-    # plt.title('HeightCount.png')
-    # plt.savefig('./TDA_height.png')
-
-def make_cumulative(col):
-
-    # ['count', 'noise_count', 'noise_count_pp', 'noise_count_exact', 'noise_count_pp_exact']
-    width = 0.2
-    all_data = []
-    for c in ['count', 'noise_count', 'noise_count_pp', 'noise_count_exact', 'noise_count_pp_exact']:
-        all_data.append(find_count(with_noise, c))
-    print(all_data)
-    vals = []
-    for i, d in enumerate(all_data):
-        
-        val = []
-
-        x = list(all_data[i].keys())
-        y = list(all_data[i].values())
-        for j, k in enumerate(x):
-            for _ in range(y[j]):
-                val.append(k)
-        vals.append(val)
-    
+    # do plot
     fig, ax = plt.subplots()
     counts, edges, bars = ax.hist(vals, label=['count', 'noise_count', 'noise_count_pp', 'noise_count_exact', 'noise_count_pp_exact'], linewidth=2, orientation='horizontal')
     for b in bars:
@@ -165,51 +126,15 @@ def make_cumulative(col):
     plt.xticks(rotation=45, fontsize=8)
     plt.ylabel('counts')
     plt.legend(loc='best')
-    plt.title('HobbyCount.png')
-    plt.savefig('./TDA.png')
+    plt.title(f'{attr}Count.png')
+    plt.savefig(f'./TDA_{attr}.png')
 
-    # hobby = []
-    # noisy_hobby = []
-    # noisy_hobby_pp = []
-    # noisy_hobby_exact = []
-    # noisy_hobby_pp_exact = []
-    # for i, row in with_noise.iterrows():
-    #     h = str(row['anony_hobby'])
-    #     if h in check_hobby:
-    #         for _ in range(int(row['count'])):
-    #             hobby.append(h)
+# attrs = ['anony_hobby', 'anony_height', 'anony_weight', 'anony_age']
+# attrs = ['anony_hobby']
+# with_noise = add_noise_to_hist(df)
 
-    #     if h in check_hobby:
-    #         for _ in range(int(row['noise_count'])):
-    #             noisy_hobby.append(h)
-
-    #     if h in check_hobby:
-    #         for _ in range(int(row['noise_count_pp'])):
-    #             noisy_hobby_pp.append(h)
-
-    #     if h in check_hobby:
-    #         for _ in range(int(row['noise_count_exact'])):
-    #             noisy_hobby_exact.append(h)
-
-    #     if h in check_hobby:
-    #         for _ in range(int(row['noise_count_pp_exact'])):
-    #             noisy_hobby_pp_exact.append(h)
-
-    # counts, edges, bars = plt.hist([hobby, noisy_hobby, noisy_hobby_pp, noisy_hobby_exact, noisy_hobby_pp_exact], label=['True Value', 'TDA', 'TDA+PP', 'TDA+Exact', 'TDA+PP+Exact'])
-    # plt.bar_label(bars)
-    # plt.legend()
-    # plt.xticks(rotation=90, fontsize=4)
-    # title = f'Comparison of {col}'
-    # plt.title(title)
-    # plt.savefig(f'{col}.png')
-    # plt.clf()
-
-
-# to_do = ['anony_hobby'] # ,'anony_age', 'anony_height', 'anony_weight','region_large', 'region_small']
-# for c in to_do:
-#     make_cumulative(c)
-
-make_cumulative_h('anony_height')
+# for attr in attrs:
+#     make_cumulative(with_noise, attr)
 
 def noise_visualization():
 
@@ -237,9 +162,12 @@ def noise_visualization():
     plt.savefig('epsilons.png')
 
 
-# plt.hist(val, weights=weight, label='PP TopDown')
-
-# plt.show()
+df = pd.read_csv('data/target_data.csv')
+user_id = df['user_id'].tolist()
+new_df = pd.read_csv('./test.csv')
+new_df['user_id'] = user_id
+new_df.rename(columns = {'anony_hobby':'hobbies' , 'anony_height':'height', 'anony_weight': 'weight', 'anony_age':'age', 'Unnamed: 0':'index'}, inplace = True)
+new_df.to_csv('./data/anonymized_data.csv', index=False)
 
 # df = pd.read_csv('better_data.csv')
 
