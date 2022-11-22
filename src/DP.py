@@ -60,24 +60,30 @@ def main():
     # constraint_qualifers = BFS.preBFS(mgraph, appArgs)
     # population_count = constraint_qualifers[1]
     gs = GlobalSens.compute_global_sens('l1', appArgs)
-    dif = []
+    noisy_val = []
+    val = []
     epsilons = [i for i in np.arange(0.01, 1.01, 0.1)]
     
     for e in epsilons:
-        n = 0
-        for _ in range(5):
-            # epsilon should not be 0
-            assert e != 0.0
-            
-            sigma = (2*np.log(1.25/1))/(e**2)
-            q = BFS.BFS(mgraph, appArgs)[0]
-            n += abs(noise.sample_dgauss(sigma))
-        n = n / 5
-        dif.append(n)
+        assert e != 0.0
 
-    plt.plot(epsilons,dif)
-    plt.show()
-    plt.savefig('epsilons.png')
+        sigma = (2*np.log(1.25/1)*(gs**2))/(e**2)
+        true_q = BFS.BFS(mgraph, appArgs)[0]
+        val.append(true_q)
+        q = true_q + noise.sample_dgauss(sigma)
+        noisy_val.append(q)
+    
+    # define histograms, have to manually change plot title and file name
+    fig, ax = plt.subplots(figsize=(12, 8))
+    bar_width = 0.4
+    x = np.arange(10)
+    b1 = ax.bar(x, val, width=bar_width, label='true value')
+    b2 = ax.bar(x + bar_width, noisy_val, label = 'noisy value', width=bar_width)
+    ax.set_xticks(x + bar_width / 2)
+    ax.set_xticklabels([0.01, 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91])
+    ax.legend()
+    ax.set_title(f'Comparision on hobby=music', pad=15)
+    plt.savefig('Noisy_hobby_count.png')
 
     # Please try: python DP.py -t region_large="Zilina Region" -m region_small="Kysucke New Town" -b hobbies="music"
 

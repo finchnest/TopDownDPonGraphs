@@ -38,7 +38,8 @@ class Constraint():
         assert self.key in Constraint.BOT_CONSTRAINTS
 
         # todo: add other bottom args here
-        if self.key in ['age', 'gender']:
+        # if self.key in ['age', 'gender']:
+        if self.key in ['gender']: # putting age into str
             castFcn = int
         elif self.key == 'height':
             # ex: convert '175 cm' to 175 (int)

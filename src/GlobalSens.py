@@ -5,7 +5,7 @@ import pandas as pd
 from RelationalOp import RelationalOp
 from tqdm import tqdm
 
-def test_filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, low_ops):
+def filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, low_ops):
     
     if low_ops == RelationalOp.EQUAL:
         df_filtered = df[(df[top_key]==top_value)&(df[med_key]==med_value)&(df[bot_key]==bot_value)]
@@ -22,7 +22,7 @@ def test_filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, 
 
 def compute_global_sens(norm, appArgs, method='count'):
 
-    df = pd.read_csv('../data/target_data.csv')
+    df = pd.read_csv('../data/anonymized_data.csv')
     assert norm in ['l1', 'l2']
 
     top_key = appArgs.top[0].key
@@ -36,7 +36,7 @@ def compute_global_sens(norm, appArgs, method='count'):
     bot_ops = appArgs.bot[0].relationalOp
 
     all_diffs = []
-    ds_origin = test_filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, bot_ops)
+    ds_origin = filter(df, top_key, top_value, med_key, med_value, bot_key, bot_value, bot_ops)
     original_query = len(ds_origin)
 
     if method == 'count':

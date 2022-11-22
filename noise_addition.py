@@ -129,9 +129,9 @@ def make_cumulative(df, attr):
     plt.title(f'{attr}Count.png')
     plt.savefig(f'./TDA_{attr}.png')
 
-# attrs = ['anony_hobby', 'anony_height', 'anony_weight', 'anony_age']
-# attrs = ['anony_hobby']
-# with_noise = add_noise_to_hist(df)
+attrs = ['anony_hobby', 'anony_height', 'anony_weight', 'anony_age']
+attrs = ['anony_hobby']
+with_noise = add_noise_to_hist(df)
 
 # for attr in attrs:
 #     make_cumulative(with_noise, attr)

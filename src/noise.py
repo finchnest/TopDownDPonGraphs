@@ -88,6 +88,8 @@ def sample_geometric_exp_fast(x,rng):
 def sample_dlaplace(scale,rng=None):
     if rng is None:
         rng = random.SystemRandom()
+    assert scale != 0
+    
     scale = Fraction(scale)
     assert scale >= 0
     while True:
