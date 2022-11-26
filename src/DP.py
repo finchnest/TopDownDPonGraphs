@@ -72,20 +72,30 @@ def main():
         sigma = (2*np.log(1.25/1)*(gs**2))/(e**2)
         true_q = BFS.BFS(mgraph, appArgs)[0]
         val.append(true_q)
-        q = true_q + noise.sample_dgauss(sigma)
-        noisy_val.append(q)
-    
-    # define histograms, have to manually change plot title and file name
-    fig, ax = plt.subplots(figsize=(12, 8))
-    bar_width = 0.4
-    x = np.arange(10)
-    b1 = ax.bar(x, val, width=bar_width, label='true value')
-    b2 = ax.bar(x + bar_width, noisy_val, label = 'noisy value', width=bar_width)
-    ax.set_xticks(x + bar_width / 2)
-    ax.set_xticklabels([0.01, 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91])
-    ax.legend()
-    ax.set_title(f'Comparision on hobby=music', pad=15)
-    plt.savefig('Noisy_hobby_count.png')
+
+        n = 0
+        for _ in range(10):
+            n += abs(noise.sample_dgauss(sigma))
+
+        noisy_val.append(n/10)
+
+    plt.plot(epsilons, noisy_val)
+    plt.title('Tradeoff between privacy and error')
+    plt.xlabel('epsilon')
+    plt.ylabel('error')
+    plt.savefig('./errors.png')
+
+    # # define histograms, have to manually change plot title and file name
+    # fig, ax = plt.subplots(figsize=(12, 8))
+    # bar_width = 0.4
+    # x = np.arange(10)
+    # b1 = ax.bar(x, val, width=bar_width, label='true value')
+    # b2 = ax.bar(x + bar_width, noisy_val, label = 'noisy value', width=bar_width)
+    # ax.set_xticks(x + bar_width / 2)
+    # ax.set_xticklabels([0.01, 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91])
+    # ax.legend()
+    # ax.set_title(f'Comparision on hobby=music', pad=15)
+    # plt.savefig('Noisy_hobby_count.png')
 
     # Please try: python DP.py -t region_large="Zilina Region" -m region_small="Kysucke New Town" -b hobbies="music"
 
