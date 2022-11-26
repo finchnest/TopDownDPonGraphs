@@ -6,7 +6,7 @@
 import math
 import matplotlib.pyplot as plt
 
-import discretegauss as dg
+import noise as dg
 
 # Begin with some code to compute aDP guarantees for discrete and continuous Gaussians
 

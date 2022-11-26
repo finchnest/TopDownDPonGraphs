@@ -4,6 +4,8 @@ import sys
 import pandas as pd
 import numpy as np
 import os
+import cdp2adp
+from fractions import Fraction
 
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
@@ -56,9 +58,6 @@ def main():
     #value updated after a node removal
 
     # updated above
-
-    # constraint_qualifers = BFS.preBFS(mgraph, appArgs)
-    # population_count = constraint_qualifers[1]
     noisy_val = []
     val = []
     #  global sensitivity
@@ -67,9 +66,27 @@ def main():
     # epsilon should not be 0
     assert not any(e == 0 for e in epsilons)
 
+    total_queries = 1 # this denotes how many queries a user want at a time, and the privacy budget will be distributed to these queries
+
     for e in epsilons:
         assert e != 0.0
-        sigma = (2*np.log(1.25/1)*(gs**2))/(e**2)
+
+        delta=1e-6
+        #convert to concentrated DP
+        rho=cdp2adp.cdp_rho(e,delta)
+        print(str(rho)+"-CDP implies ("+str(e)+","+str(delta)+")-DP")
+        #number of queries
+        k=total_queries
+        #divide privacy budget up amongst queries
+        #Each query needs to be (rho/k)-concentrated DP
+        #cast to Fraction so subsequent arithmetic is exact
+        rho_per_q = Fraction(rho)/k 
+        #compute noise variance parameter per query
+        sigma=1/(2*rho_per_q)
+        #actual variance, at most sigma2
+        
+        # var = noise.variance(sigma2)
+        # print("standard deviation for each count = "+str(math.sqrt(var)))
         true_q = BFS.BFS(mgraph, appArgs)[0]
         val.append(true_q)
 
