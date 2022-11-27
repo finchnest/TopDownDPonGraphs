@@ -87,7 +87,7 @@ def main():
 
         true_q = BFS.BFS(mgraph, appArgs)[0]
         val.append(true_q)
-        noisy_val = true_q + noise.sample_dgauss(sigma)
+        noisy_value = true_q + noise.sample_dgauss(sigma)
         # DO PostProcessing Here
 
         n = 0
