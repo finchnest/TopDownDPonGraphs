@@ -15,7 +15,7 @@ import GlobalSens
 import utils
 import noise
 import matplotlib.pyplot as plt
-import BFS
+from BFS import BFS
 
 vis_attributes = ['gender', 'region_large', 'region_small', 'age', 'weight', 'height', 'hobbies', 'user_id']
 
@@ -47,30 +47,19 @@ def main():
     # forward command line arguments to be validated (sys.argv)
     appArgs = parseArgs(sys.argv[1:])
 
-    # debug purposes (delete when no longer necessary)
-    # print(appArgs)
-    # print(appArgs.top)
-    # print(appArgs.med)
-    # print(appArgs.bot)
-
-    # forward command line arguments to the BFS search function
-
-    #value updated after a node removal
-
-    # updated above
     noisy_val = []
-    val = []
     #  global sensitivity
     gs = GlobalSens.compute_global_sens('../data/target_data.csv', 'l1', appArgs)
     epsilons = [i for i in np.arange(0.01, 1.01, 0.1)]
     # epsilon should not be 0
     assert not any(e == 0 for e in epsilons)
 
+    nodes = BFS(mgraph, appArgs)
+    true_count = len(nodes)
+
     total_queries = 1 # this denotes how many queries a user want at a time, and the privacy budget will be distributed to these queries
 
     for e in epsilons:
-        assert e != 0.0
-
         delta=0.1
         #convert to concentrated DP
         rho=cdp2adp.cdp_rho(e,delta)
@@ -80,14 +69,12 @@ def main():
         #divide privacy budget up amongst queries
         #Each query needs to be (rho/k)-concentrated DP
         #cast to Fraction so subsequent arithmetic is exact
-        rho_per_q = Fraction(rho)/k 
+        rho_per_q = Fraction(rho)/k
         #compute noise variance parameter per query
         sigma=1/(2*rho_per_q)
         # Discrete DP requires a different method to calculate sigma
 
-        true_q = BFS.BFS(mgraph, appArgs)[0]
-        val.append(true_q)
-        noisy_value = true_q + noise.sample_dgauss(sigma)
+        noisy_count = true_count + noise.sample_dgauss(sigma)
         # DO PostProcessing Below
 
         # Run through multiple noise sampling to get a more stable outcome

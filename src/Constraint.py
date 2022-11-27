@@ -6,7 +6,7 @@ class Constraint():
     # permitted constraint values
     TOP_CONSTRAINTS = {'region_large', 'top2'}
     MED_CONSTRAINTS = {'region_small', 'med2'}
-    BOT_CONSTRAINTS = {'age', 'gender', 'hobbies', 'height', 'weight'} # todo: add more here
+    BOT_CONSTRAINTS = {'age', 'gender', 'hobbies', 'height', 'weight'}
 
     def __init__(self, key: str, value: str, relationalOp: RelationalOp):
         self.key = key
@@ -37,7 +37,6 @@ class Constraint():
     def _getCastFunction(self):
         assert self.key in Constraint.BOT_CONSTRAINTS
 
-        # todo: add other bottom args here
         if self.key in ['age', 'gender']:
             castFcn = int
         elif self.key in ['height', 'weight']:
