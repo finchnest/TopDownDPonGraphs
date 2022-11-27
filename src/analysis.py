@@ -65,7 +65,7 @@ def main():
     # epsilon should not be 0
     assert not any(e == 0 for e in epsilons)
 
-    total_queries = [i for i in range(1, 11)] # this denotes how many queries a user want at a time, and the privacy budget will be distributed to these queries
+    total_queries = [i for i in range(10, 0, -1)] # this denotes how many queries a user want at a time, and the privacy budget will be distributed to these queries
 
     noisy_queries = []
     for k in total_queries:
@@ -96,7 +96,6 @@ def main():
 
     sn.set(font_scale=0.7)
     epsilons = [round(e, 3) for e in epsilons]
-    total_queries = [i for i in range(10, 0, -1)]
     sn.heatmap(noisy_queries, xticklabels=epsilons, yticklabels=total_queries, annot=True)
     plt.title('Error And QueryAmount Relationship(delta=0.1)')
     plt.xlabel('Epsilon')

@@ -71,7 +71,7 @@ def main():
     for e in epsilons:
         assert e != 0.0
 
-        delta=0.5
+        delta=0.1
         #convert to concentrated DP
         rho=cdp2adp.cdp_rho(e,delta)
         print(str(rho)+"-CDP implies ("+str(e)+","+str(delta)+")-DP")
