@@ -80,18 +80,11 @@ def main():
             delta=0.1
             #convert to concentrated DP
             rho=cdp2adp.cdp_rho(e,delta)
-            #number of queries
-            #divide privacy budget up amongst queries
-            #Each query needs to be (rho/k)-concentrated DP
-            #cast to Fraction so subsequent arithmetic is exact
             rho_per_q = Fraction(rho)/k 
-            #compute noise variance parameter per query
             sigma=1/(2*rho_per_q)
             #actual variance, at most sigma2
             print(str(round(rho, 6))+"-CDP implies ("+str(round(e, 2))+","+str(delta)+")-DP ||", f"True DP coefficient: Epsilon={round(e, 2)} | Budget={round(delta/k, 3)} | Sigma={sigma}")
             # USE this code below if u want to queries other than count
-            # true_q = BFS.BFS(mgraph, appArgs)[0]
-            # val.append(true_q)
 
             n = 0
             for _ in range(10):
@@ -100,6 +93,7 @@ def main():
             noisy_val.append(n/10)
 
         noisy_queries.append(noisy_val)
+
     sn.set(font_scale=0.7)
     epsilons = [round(e, 3) for e in epsilons]
     total_queries = [i for i in range(10, 0, -1)]

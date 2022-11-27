@@ -70,7 +70,6 @@ def main():
     # epsilon should not be 0
     assert not any(e == 0 for e in epsilons)
 
-
     #degree distribution
     epi = 0.5
     edge_df = pd.read_csv(parent+'/data/example_edge_20k.csv')
@@ -80,12 +79,14 @@ def main():
     print('people amount', len(true_q))
     edge_counts = []
 
+    # Collecting edge count for every qualified users
     for node_id in true_q:
         edge_count = len(neighbor_info[node_id])
         edge_counts.append(edge_count)
 
     hist = Counter(edge_counts)
 
+    # Convert the original epsilon to the concertrated DP(Top-Down algorithm actually requires this version of DP)
     noisy_data ={}
     delta=0.9
     rho=cdp2adp.cdp_rho(epi,delta)
@@ -93,15 +94,20 @@ def main():
     rho_per_q = Fraction(rho)/k 
     sigma=1/(2*rho_per_q)
 
+    # Just check some statistics
     max_v, min_v = max(list(hist.keys())), min(list(hist.keys()))
     sample_range = [max(list(hist.values())), min(list(hist.values()))]
 
+    # Adding noise
     print('max min degree', max_v, min_v)
     for i in range(min_v, max_v+1):
         if i in hist.keys():
             noisy_value = hist[i] + noise.sample_dgauss(sigma)
             noisy_data[i] = noisy_value
+            # DO PostProcessing Below
 
+
+    # Below is only for visualization purposes
     true_query = []
     for k, v in hist.items(): 
         for _ in range(v):
@@ -114,10 +120,6 @@ def main():
 
     print('noise', len(noisy_query))
     print('true', len(true_query))
-
-    # sns.histplot([true_query, noisy_query], label = ['true value', 'noisy value'],  kde=[True, True])
-    # plt.hist(x=true_query, label = 'true value', color='darkorange', bins=40, alpha=0.5)
-    # plt.hist(x=noisy_query, label =  'noisy value', color='cornflowerblue', bins=40, alpha=0.5)
 
     fig, ax = plt.subplots()
     for i, a in enumerate([true_query, noisy_query]):

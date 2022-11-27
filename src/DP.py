@@ -88,14 +88,16 @@ def main():
         true_q = BFS.BFS(mgraph, appArgs)[0]
         val.append(true_q)
         noisy_value = true_q + noise.sample_dgauss(sigma)
-        # DO PostProcessing Here
+        # DO PostProcessing Below
 
+        # Run through multiple noise sampling to get a more stable outcome
         n = 0
         for _ in range(10):
             n += abs(noise.sample_dgauss(sigma))
 
         noisy_val.append(n/10)
 
+    # Below is for the visualization
     plt.plot(epsilons, noisy_val)
     plt.title('Tradeoff between privacy and error')
     plt.xlabel('epsilon')
