@@ -17,6 +17,7 @@ import noise
 import matplotlib.pyplot as plt
 import BFS
 
+import seaborn as sns
 from collections import Counter
 
 
@@ -71,11 +72,12 @@ def main():
 
 
     #degree distribution
-    epi = 0.3
+    epi = 0.5
     edge_df = pd.read_csv(parent+'/data/example_edge_20k.csv')
     neighbor_info = utils.get_neighbor_information(edge_df)
     true_q = BFS.BFS(mgraph, appArgs)
 
+    print('people amount', len(true_q))
     edge_counts = []
 
     for node_id in true_q:
@@ -85,77 +87,50 @@ def main():
     hist = Counter(edge_counts)
 
     noisy_data ={}
+    delta=0.9
+    rho=cdp2adp.cdp_rho(epi,delta)
+    k=len(hist)
+    rho_per_q = Fraction(rho)/k 
+    sigma=1/(2*rho_per_q)
 
-    for key, value in hist:
-        delta=1e-6
-        rho=cdp2adp.cdp_rho(epi,delta)
-        k=len(hist)
-        rho_per_q = Fraction(rho)/k 
-        sigma=1/(2*rho_per_q)
-        noisy_value = value + noise.sample_dgauss(sigma)
-        noisy_data[key] = noisy_value
+    max_v, min_v = max(list(hist.keys())), min(list(hist.keys()))
+    sample_range = [max(list(hist.values())), min(list(hist.values()))]
 
+    print('max min degree', max_v, min_v)
+    for i in range(min_v, max_v+1):
+        if i in hist.keys():
+            noisy_value = hist[i] + noise.sample_dgauss(sigma)
+            noisy_data[i] = noisy_value
 
+    true_query = []
+    for k, v in hist.items(): 
+        for _ in range(v):
+            true_query.append(k)
 
-    total_queries = 1 # this denotes how many queries a user want at a time, and the privacy budget will be distributed to these queries
+    noisy_query = []
+    for k, v in noisy_data.items(): 
+        for _ in range(v):
+            noisy_query.append(k)
 
-    for e in epsilons:
-        assert e != 0.0
+    print('noise', len(noisy_query))
+    print('true', len(true_query))
 
-        delta=1e-6
-        #convert to concentrated DP
-        rho=cdp2adp.cdp_rho(e,delta)
-        print(str(rho)+"-CDP implies ("+str(e)+","+str(delta)+")-DP")
-        #number of queries
-        k=total_queries
-        #divide privacy budget up amongst queries
-        #Each query needs to be (rho/k)-concentrated DP
-        #cast to Fraction so subsequent arithmetic is exact
-        rho_per_q = Fraction(rho)/k 
-        #compute noise variance parameter per query
-        sigma=1/(2*rho_per_q)
-        #actual variance, at most sigma2
-        
-        # var = noise.variance(sigma2)
-        # print("standard deviation for each count = "+str(math.sqrt(var)))
-        true_q = BFS.BFS(mgraph, appArgs)[0]
-        val.append(true_q)
+    # sns.histplot([true_query, noisy_query], label = ['true value', 'noisy value'],  kde=[True, True])
+    # plt.hist(x=true_query, label = 'true value', color='darkorange', bins=40, alpha=0.5)
+    # plt.hist(x=noisy_query, label =  'noisy value', color='cornflowerblue', bins=40, alpha=0.5)
 
-        n = 0
-        for _ in range(10):
-            n += abs(noise.sample_dgauss(sigma))
+    fig, ax = plt.subplots()
+    for i, a in enumerate([true_query, noisy_query]):
+        if i == 0:
+            sns.histplot(a, ax=ax, kde=True, alpha=0.5, color='darkorange', bins=40, legend=True, label='true',binwidth=3, stat='percent')
+        else:
+            sns.histplot(a, ax=ax, kde=True, alpha=0.5, color='cornflowerblue', bins=40, legend=True, label='noisy', binwidth=3, stat='percent')
 
-        noisy_val.append(n/10)
-
-    plt.plot(epsilons, noisy_val)
-    plt.title('Tradeoff between privacy and error')
-    plt.xlabel('epsilon')
-    plt.ylabel('error')
-    plt.savefig('./errors.png')
-
-    # # define histograms, have to manually change plot title and file name
-    # fig, ax = plt.subplots(figsize=(12, 8))
-    # bar_width = 0.4
-    # x = np.arange(10)
-    # b1 = ax.bar(x, val, width=bar_width, label='true value')
-    # b2 = ax.bar(x + bar_width, noisy_val, label = 'noisy value', width=bar_width)
-    # ax.set_xticks(x + bar_width / 2)
-    # ax.set_xticklabels([0.01, 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91])
-    # ax.legend()
-    # ax.set_title(f'Comparision on hobby=music', pad=15)
-    # plt.savefig('Noisy_hobby_count.png')
-
-    # Please try: python DP.py -t region_large="Zilina Region" -m region_small="Kysucke New Town" -b hobbies="music"
-
-    # return population_count
-
-    #  result_x  = noise_add_func(population_count)
-
-    #fidelity check
-
-    # return to user
-
-    #noise addition function takes population count as an argument
+    plt.legend()
+    plt.xlabel('Degree')
+    plt.ylabel('Counts')
+    plt.title('Cumulative Degree Distribution')
+    plt.savefig('DegreeDist.png')
 
 
 if __name__ == '__main__':

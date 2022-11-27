@@ -71,7 +71,7 @@ def main():
     for e in epsilons:
         assert e != 0.0
 
-        delta=1e-6
+        delta=0.5
         #convert to concentrated DP
         rho=cdp2adp.cdp_rho(e,delta)
         print(str(rho)+"-CDP implies ("+str(e)+","+str(delta)+")-DP")
@@ -83,12 +83,12 @@ def main():
         rho_per_q = Fraction(rho)/k 
         #compute noise variance parameter per query
         sigma=1/(2*rho_per_q)
-        #actual variance, at most sigma2
-        
-        # var = noise.variance(sigma2)
-        # print("standard deviation for each count = "+str(math.sqrt(var)))
+        # Discrete DP requires a different method to calculate sigma
+
         true_q = BFS.BFS(mgraph, appArgs)[0]
         val.append(true_q)
+        noisy_val = true_q + noise.sample_dgauss(sigma)
+        # DO PostProcessing Here
 
         n = 0
         for _ in range(10):
@@ -101,18 +101,6 @@ def main():
     plt.xlabel('epsilon')
     plt.ylabel('error')
     plt.savefig('./errors.png')
-
-    # # define histograms, have to manually change plot title and file name
-    # fig, ax = plt.subplots(figsize=(12, 8))
-    # bar_width = 0.4
-    # x = np.arange(10)
-    # b1 = ax.bar(x, val, width=bar_width, label='true value')
-    # b2 = ax.bar(x + bar_width, noisy_val, label = 'noisy value', width=bar_width)
-    # ax.set_xticks(x + bar_width / 2)
-    # ax.set_xticklabels([0.01, 0.11, 0.21, 0.31, 0.41, 0.51, 0.61, 0.71, 0.81, 0.91])
-    # ax.legend()
-    # ax.set_title(f'Comparision on hobby=music', pad=15)
-    # plt.savefig('Noisy_hobby_count.png')
 
     # Please try: python DP.py -t region_large="Zilina Region" -m region_small="Kysucke New Town" -b hobbies="music"
 
